@@ -11,10 +11,12 @@ import Highlight from "@tiptap/extension-highlight";
 import { Color } from "@tiptap/extension-color";
 import { CustomImage } from "./editor/CustomImage";
 import { useStore } from "../store";
-import { useEffect, useState, useRef } from "react";
+import { useShallow } from "zustand/react/shallow";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { Home, ChevronRight, ChevronsRight, FileText, Pin } from "lucide-react";
-import { emit, listen } from "@tauri-apps/api/event";
+import { emit } from "@tauri-apps/api/event";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 import { SlashCommand } from "./editor/SlashCommand";
 import {
@@ -35,7 +37,16 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
     setSelectedLayer,
     setSelectedNote,
     openInCurrentTab,
-  } = useStore();
+  } = useStore(useShallow((state) => ({
+    notes: state.notes,
+    layers: state.layers,
+    updateNote: state.updateNote,
+    isSidebarOpen: state.isSidebarOpen,
+    toggleSidebar: state.toggleSidebar,
+    setSelectedLayer: state.setSelectedLayer,
+    setSelectedNote: state.setSelectedNote,
+    openInCurrentTab: state.openInCurrentTab,
+  })));
   const note = notes[noteId];
   const layer = note
     ? layers[note.layerId] ||
@@ -49,29 +60,103 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
     text: string;
   } | null>(null);
 
+  const extensions = useMemo(() => [
+    StarterKit,
+    TaskList,
+    TaskItem.configure({
+      nested: true,
+    }),
+    Placeholder.configure({
+      placeholder: "Type '/' for commands",
+    }),
+    CustomImage.configure({
+      allowBase64: true,
+      HTMLAttributes: {
+        class: "rounded-lg max-w-full",
+      },
+    }),
+    SlashCommand,
+    Underline,
+    TextStyle,
+    Color,
+    FontSize,
+    Highlight.configure({ multicolor: true }),
+  ], []);
+
+  const editorProps = useMemo(() => ({
+    transformPastedText,
+    transformPastedHTML,
+    attributes: {
+      class: "prose prose-sm sm:prose-base focus:outline-none max-w-none",
+    },
+    handleDrop: function (view: any, event: any, _slice: any, moved: any) {
+      if (
+        !moved &&
+        event.dataTransfer &&
+        event.dataTransfer.files &&
+        event.dataTransfer.files[0]
+      ) {
+        const file = event.dataTransfer.files[0];
+        if (file.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const { schema } = view.state;
+            const coordinates = view.posAtCoords({
+              left: event.clientX,
+              top: event.clientY,
+            });
+            const node = schema.nodes.image.create({
+              src: e.target?.result as string,
+            });
+            const transaction = view.state.tr.insert(
+              coordinates?.pos || 0,
+              node,
+            );
+            view.dispatch(transaction);
+          };
+          reader.readAsDataURL(file);
+          return true;
+        }
+      }
+      return false;
+    },
+    handlePaste: function (_view: any, event: any, _slice: any) {
+      if (
+        event.clipboardData &&
+        event.clipboardData.files &&
+        event.clipboardData.files[0]
+      ) {
+        const file = event.clipboardData.files[0];
+        if (file.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const { schema } = _view.state;
+            const node = schema.nodes.image.create({
+              src: e.target?.result as string,
+            });
+            const transaction = _view.state.tr.replaceSelectionWith(node);
+            _view.dispatch(transaction);
+          };
+          reader.readAsDataURL(file);
+          return true;
+        }
+      }
+
+      const html = event.clipboardData?.getData("text/html") || "";
+      const text = event.clipboardData?.getData("text/plain") || "";
+
+      if (hasMultipleBrOrNbsp(html, text)) {
+        event.preventDefault();
+        setPasteModalData({ html, text });
+        return true;
+      }
+
+      return false;
+    },
+  }), []);
+
   const editor = useEditor({
-    extensions: [
-      StarterKit,
-      TaskList,
-      TaskItem.configure({
-        nested: true,
-      }),
-      Placeholder.configure({
-        placeholder: "Type '/' for commands",
-      }),
-      CustomImage.configure({
-        allowBase64: true,
-        HTMLAttributes: {
-          class: "rounded-lg max-w-full",
-        },
-      }),
-      SlashCommand,
-      Underline,
-      TextStyle,
-      Color,
-      FontSize,
-      Highlight.configure({ multicolor: true }),
-    ],
+    extensions,
     content: note?.content || "",
     parseOptions: {
       preserveWhitespace: false,
@@ -79,79 +164,9 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
     onUpdate: ({ editor }) => {
       const newContent = editor.getHTML();
       updateNote(noteId, { content: newContent });
-      emit("sync-note", { noteId, content: newContent, source: "main" });
+      emit("sync-note", { noteId, content: newContent, source: getCurrentWindow().label });
     },
-    editorProps: {
-      transformPastedText,
-      transformPastedHTML,
-      attributes: {
-        class: "prose prose-sm sm:prose-base focus:outline-none max-w-none",
-      },
-      handleDrop: function (view, event, _slice, moved) {
-        if (
-          !moved &&
-          event.dataTransfer &&
-          event.dataTransfer.files &&
-          event.dataTransfer.files[0]
-        ) {
-          const file = event.dataTransfer.files[0];
-          if (file.type.startsWith("image/")) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              const { schema } = view.state;
-              const coordinates = view.posAtCoords({
-                left: event.clientX,
-                top: event.clientY,
-              });
-              const node = schema.nodes.image.create({
-                src: e.target?.result as string,
-              });
-              const transaction = view.state.tr.insert(
-                coordinates?.pos || 0,
-                node,
-              );
-              view.dispatch(transaction);
-            };
-            reader.readAsDataURL(file);
-            return true;
-          }
-        }
-        return false;
-      },
-      handlePaste: function (_view, event, _slice) {
-        if (
-          event.clipboardData &&
-          event.clipboardData.files &&
-          event.clipboardData.files[0]
-        ) {
-          const file = event.clipboardData.files[0];
-          if (file.type.startsWith("image/")) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              const { schema } = _view.state;
-              const node = schema.nodes.image.create({
-                src: e.target?.result as string,
-              });
-              const transaction = _view.state.tr.replaceSelectionWith(node);
-              _view.dispatch(transaction);
-            };
-            reader.readAsDataURL(file);
-            return true;
-          }
-        }
-
-        const html = event.clipboardData?.getData("text/html") || "";
-        const text = event.clipboardData?.getData("text/plain") || "";
-
-        if (hasMultipleBrOrNbsp(html, text)) {
-          event.preventDefault();
-          setPasteModalData({ html, text });
-          return true;
-        }
-
-        return false;
-      },
-    },
+    editorProps,
   });
 
   const handleStripSpaces = () => {
@@ -176,15 +191,18 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Update editor content when switching notes or receiving sync event
+  // Update editor content when switching notes or receiving sync event from Zustand
   useEffect(() => {
     if (editor && note && editor.getHTML() !== note.content) {
       editor.commands.setContent(note.content || "");
     }
-    if (note) {
+  }, [noteId, editor, note?.content]); 
+
+  useEffect(() => {
+    if (note && title !== note.title) {
       setTitle(note.title);
     }
-  }, [noteId, editor]); // intentionally omitted note to prevent loop on every update
+  }, [note?.title]);
 
   // Reset scroll position when switching notes
   useEffect(() => {
@@ -193,28 +211,12 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
     }
   }, [noteId]);
 
-  useEffect(() => {
-    const unlistenPromise = listen("sync-note", (event: any) => {
-      const { noteId: id, content, source } = event.payload;
-      if (id === noteId && source !== "main") {
-        if (editor && editor.getHTML() !== content) {
-          editor.commands.setContent(content);
-          updateNote(noteId, { content });
-        }
-      }
-    });
-
-    return () => {
-      unlistenPromise.then((fn) => fn()).catch(console.error);
-    };
-  }, [editor, noteId]);
-
   if (!note) return null;
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
     updateNote(noteId, { title: e.target.value });
-    emit("sync-title", { noteId, title: e.target.value, source: "main" });
+    emit("sync-title", { noteId, title: e.target.value, source: getCurrentWindow().label });
   };
 
   return (

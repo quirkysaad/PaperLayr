@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useStore } from "../store";
+import { useShallow } from "zustand/react/shallow";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import TaskList from "@tiptap/extension-task-list";
@@ -12,7 +13,7 @@ import { TextStyle } from "@tiptap/extension-text-style";
 import Placeholder from "@tiptap/extension-placeholder";
 import { SlashCommand } from "./editor/SlashCommand";
 import { FontSize } from "./editor/FontSize";
-import { emit, listen } from "@tauri-apps/api/event";
+import { emit } from "@tauri-apps/api/event";
 import {
   hasMultipleBrOrNbsp,
   stripExtraBrAndNbsp,
@@ -28,7 +29,10 @@ export const Widget = ({
   noteId?: string;
   isSticky?: boolean;
 }) => {
-  const { notes, updateNote } = useStore();
+  const { notes, updateNote } = useStore(useShallow((state) => ({
+    notes: state.notes,
+    updateNote: state.updateNote,
+  })));
   const note = noteId ? notes[noteId] : null;
   const [title, setTitle] = useState(note?.title || "");
   const [pasteModalData, setPasteModalData] = useState<{
@@ -60,21 +64,43 @@ export const Widget = ({
     };
   }, []);
 
+  const extensions = useMemo(() => [
+    StarterKit,
+    TaskList,
+    TaskItem.configure({ nested: true }),
+    CustomImage.configure({
+      allowBase64: true,
+      HTMLAttributes: { class: "rounded-lg max-w-full" },
+    }),
+    Placeholder.configure({ placeholder: "Type '/' for commands" }),
+    SlashCommand,
+    Underline,
+    TextStyle,
+    FontSize,
+  ], []);
+
+  const editorProps = useMemo(() => ({
+    transformPastedText,
+    transformPastedHTML,
+    attributes: {
+      class: "prose prose-sm focus:outline-none max-w-none text-sm",
+    },
+    handlePaste: function (_view: any, event: any, _slice: any) {
+      const html = event.clipboardData?.getData("text/html") || "";
+      const text = event.clipboardData?.getData("text/plain") || "";
+
+      if (hasMultipleBrOrNbsp(html, text)) {
+        event.preventDefault();
+        setPasteModalData({ html, text });
+        return true;
+      }
+
+      return false;
+    },
+  }), []);
+
   const editor = useEditor({
-    extensions: [
-      StarterKit,
-      TaskList,
-      TaskItem.configure({ nested: true }),
-      CustomImage.configure({
-        allowBase64: true,
-        HTMLAttributes: { class: "rounded-lg max-w-full" },
-      }),
-      Placeholder.configure({ placeholder: "Type '/' for commands" }),
-      SlashCommand,
-      Underline,
-      TextStyle,
-      FontSize,
-    ],
+    extensions,
     content: note?.content || "",
     parseOptions: {
       preserveWhitespace: false,
@@ -90,25 +116,7 @@ export const Widget = ({
         });
       }
     },
-    editorProps: {
-      transformPastedText,
-      transformPastedHTML,
-      attributes: {
-        class: "prose prose-sm focus:outline-none max-w-none text-sm",
-      },
-      handlePaste: function (_view, event, _slice) {
-        const html = event.clipboardData?.getData("text/html") || "";
-        const text = event.clipboardData?.getData("text/plain") || "";
-
-        if (hasMultipleBrOrNbsp(html, text)) {
-          event.preventDefault();
-          setPasteModalData({ html, text });
-          return true;
-        }
-
-        return false;
-      },
-    },
+    editorProps,
   });
 
   const handleStripSpaces = () => {
@@ -131,45 +139,19 @@ export const Widget = ({
     setPasteModalData(null);
   };
 
-  useEffect(() => {
-    if (!noteId) return;
-
-    const unlistenNotePromise = listen("sync-note", (event: any) => {
-      const { noteId: id, content, source } = event.payload;
-      if (id === noteId && source !== getCurrentWindow().label) {
-        if (editor && editor.getHTML() !== content) {
-          editor.commands.setContent(content);
-          updateNote(noteId, { content }); // update local zustand
-        }
-      }
-    });
-
-    const unlistenTitlePromise = listen("sync-title", (event: any) => {
-      const { noteId: id, title, source } = event.payload;
-      if (id === noteId && source !== getCurrentWindow().label) {
-        updateNote(noteId, { title });
-      }
-    });
-
-    return () => {
-      unlistenNotePromise.then((fn) => fn()).catch(console.error);
-      unlistenTitlePromise.then((fn) => fn()).catch(console.error);
-    };
-  }, [editor, noteId]);
-
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (editor && note && editor.getHTML() !== note.content) {
       editor.commands.setContent(note.content || "");
-      // Reset scroll position after setting content
-      setTimeout(() => {
-        if (scrollRef.current) {
-          scrollRef.current.scrollTop = 0;
-        }
-      }, 0);
     }
-  }, [editor]); // Run once when editor is ready
+  }, [editor, note?.content]);
+
+  useEffect(() => {
+    if (note && title !== note.title) {
+      setTitle(note.title);
+    }
+  }, [note?.title]);
 
   if (noteId && !note) {
     return (

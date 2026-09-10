@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStore } from '../store';
+import { useShallow } from 'zustand/react/shallow';
 import { Search as SearchIcon, FileText, Folder } from 'lucide-react';
 
 export const Search = () => {
@@ -15,7 +16,19 @@ export const Search = () => {
     openTab,
     openInCurrentTab,
     searchMode
-  } = useStore();
+  } = useStore(useShallow((state) => ({
+    isSearchOpen: state.isSearchOpen,
+    searchQuery: state.searchQuery,
+    setSearchOpen: state.setSearchOpen,
+    setSearchQuery: state.setSearchQuery,
+    layers: state.layers,
+    notes: state.notes,
+    setSelectedLayer: state.setSelectedLayer,
+    setSelectedNote: state.setSelectedNote,
+    openTab: state.openTab,
+    openInCurrentTab: state.openInCurrentTab,
+    searchMode: state.searchMode,
+  })));
   
   const inputRef = useRef<HTMLInputElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);

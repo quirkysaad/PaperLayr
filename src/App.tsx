@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 import { listen } from "@tauri-apps/api/event";
 import { Sidebar } from "./components/Sidebar";
@@ -9,9 +10,13 @@ import { ConfirmModal } from "./components/ConfirmModal";
 import { LayerModal } from "./components/LayerModal";
 import { Widget } from "./components/Widget";
 import { useStore } from "./store";
+import { useShallow } from "zustand/react/shallow";
 
 function App() {
-  const { layers, isSidebarOpen } = useStore();
+  const { layers, isSidebarOpen } = useStore(useShallow((state) => ({
+    layers: state.layers,
+    isSidebarOpen: state.isSidebarOpen,
+  })));
   const urlParams = new URLSearchParams(window.location.search);
   const widgetId = urlParams.get("widget");
 
@@ -29,6 +34,28 @@ function App() {
       }, 100);
     }
   }, [layers]);
+
+  // Global Sync Listeners
+  useEffect(() => {
+    const unlistenSyncNote = listen("sync-note", (event: any) => {
+      const { noteId, content, source } = event.payload;
+      if (source !== getCurrentWindow().label) {
+        useStore.getState().updateNote(noteId, { content });
+      }
+    });
+
+    const unlistenSyncTitle = listen("sync-title", (event: any) => {
+      const { noteId, title, source } = event.payload;
+      if (source !== getCurrentWindow().label) {
+        useStore.getState().updateNote(noteId, { title });
+      }
+    });
+
+    return () => {
+      unlistenSyncNote.then((fn) => fn()).catch(console.error);
+      unlistenSyncTitle.then((fn) => fn()).catch(console.error);
+    };
+  }, []);
 
   // Global Keyboard shortcuts
   useEffect(() => {

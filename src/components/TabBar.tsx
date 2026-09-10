@@ -1,10 +1,18 @@
 // @ts-nocheck
 import { useStore } from "../store";
+import { useShallow } from "zustand/react/shallow";
 import { X, Plus, ArrowLeft, ArrowRight } from "lucide-react";
 
 export const TabBar = () => {
   const { openTabs, selectedNoteId, notes, openTab, closeTab, setSearchOpen } =
-    useStore();
+    useStore(useShallow((state) => ({
+      openTabs: state.openTabs,
+      selectedNoteId: state.selectedNoteId,
+      notes: state.notes,
+      openTab: state.openTab,
+      closeTab: state.closeTab,
+      setSearchOpen: state.setSearchOpen,
+    })));
 
   return (
     <div

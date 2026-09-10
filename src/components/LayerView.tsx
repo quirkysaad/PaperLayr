@@ -1,4 +1,5 @@
 import { useStore } from '../store';
+import { useShallow } from 'zustand/react/shallow';
 import { Plus, Star, ChevronsRight, FileText } from 'lucide-react';
 
 const PASTEL_COLORS = [
@@ -19,7 +20,14 @@ const getNoteColorClasses = (id: string) => {
 };
 
 export const LayerView = ({ layerId }: { layerId: string }) => {
-  const { layers, notes, openInCurrentTab, createNote, isSidebarOpen, toggleSidebar } = useStore();
+  const { layers, notes, openInCurrentTab, createNote, isSidebarOpen, toggleSidebar } = useStore(useShallow((state) => ({
+    layers: state.layers,
+    notes: state.notes,
+    openInCurrentTab: state.openInCurrentTab,
+    createNote: state.createNote,
+    isSidebarOpen: state.isSidebarOpen,
+    toggleSidebar: state.toggleSidebar,
+  })));
   const layer = layers[layerId] || (layerId === 'stickies' ? { id: 'stickies', name: 'Stickies', accentColor: '#gray' } : null);
 
   if (!layer) return null;

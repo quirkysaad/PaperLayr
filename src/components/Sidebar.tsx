@@ -24,10 +24,13 @@ import {
 import { useStore } from "../store";
 
 import { Layer } from "../types";
+import { useShallow } from "zustand/react/shallow";
 
 export const Sidebar = () => {
-  const { openTab, openInCurrentTab, openTabs } = useStore();
   const {
+    openTab,
+    openInCurrentTab,
+    openTabs,
     layers,
     notes,
     selectedLayerId,
@@ -47,7 +50,30 @@ export const Sidebar = () => {
     sidebarWidth,
     setSidebarWidth,
     toggleSidebar,
-  } = useStore();
+  } = useStore(useShallow((state) => ({
+    openTab: state.openTab,
+    openInCurrentTab: state.openInCurrentTab,
+    openTabs: state.openTabs,
+    layers: state.layers,
+    notes: state.notes,
+    selectedLayerId: state.selectedLayerId,
+    selectedNoteId: state.selectedNoteId,
+    setSelectedLayer: state.setSelectedLayer,
+    setSelectedNote: state.setSelectedNote,
+    createLayer: state.createLayer,
+    createNote: state.createNote,
+    updateNote: state.updateNote,
+    deleteNote: state.deleteNote,
+    duplicateNote: state.duplicateNote,
+    deleteLayer: state.deleteLayer,
+    renameLayer: state.renameLayer,
+    setSearchOpen: state.setSearchOpen,
+    openConfirm: state.openConfirm,
+    openLayerModal: state.openLayerModal,
+    sidebarWidth: state.sidebarWidth,
+    setSidebarWidth: state.setSidebarWidth,
+    toggleSidebar: state.toggleSidebar,
+  })));
 
   const startResizing = (e: React.MouseEvent) => {
     e.preventDefault();

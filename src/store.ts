@@ -291,7 +291,7 @@ export const useStore = create<Store>()(
               'stickies'
             ]);
             
-            let recoveredLayerId = null;
+            let recoveredLayerId: string | null = null;
 
             Object.values(persistedState.notes).forEach((note: any) => {
               if (note.spaceId) {
