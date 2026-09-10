@@ -15,7 +15,7 @@ export function hasMultipleBrOrNbsp(html: string, text: string): boolean {
   // Check for 3 or more consecutive newlines (meaning 2 or more empty lines)
   const hasMultipleNewlines = /\n{3,}/.test(normalizedText);
 
-  // Check for 2 or more consecutive spaces
+  // Check for 2 or more consecutive layers
   const hasMultipleSpaces = /[ \t\u00A0]{2,}/.test(normalizedText);
 
   if (hasMultipleNewlines || hasMultipleSpaces) {
@@ -60,7 +60,7 @@ export function stripExtraBrAndNbsp(
     // Collapse 3 or more consecutive <br> tags into exactly 2 <br> tags (1 blank line)
     cleaned = cleaned.replace(/(<br\s*\/?>\s*){3,}/gi, "<br /><br />");
     
-    // Collapse multiple spaces
+    // Collapse multiple layers
     cleaned = cleaned.replace(/(&nbsp;|\u00A0){2,}/gi, " ");
     
     return { content: cleaned, isHtml: true };
@@ -73,7 +73,7 @@ export function stripExtraBrAndNbsp(
     // Collapse 3 or more consecutive newlines into exactly 2 newlines.
     normalizedText = normalizedText.replace(/\n{3,}/g, "\n\n");
 
-    // Collapse multiple internal spaces
+    // Collapse multiple internal layers
     normalizedText = normalizedText.replace(/[ \t\u00A0]{2,}/g, " ");
 
     normalizedText = normalizedText.trim();

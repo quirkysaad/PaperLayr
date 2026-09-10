@@ -28,19 +28,19 @@ import {
 export const NoteEditor = ({ noteId }: { noteId: string }) => {
   const {
     notes,
-    spaces,
+    layers,
     updateNote,
     isSidebarOpen,
     toggleSidebar,
-    setSelectedSpace,
+    setSelectedLayer,
     setSelectedNote,
     openInCurrentTab,
   } = useStore();
   const note = notes[noteId];
-  const space = note
-    ? spaces[note.spaceId] ||
-      (note.spaceId === "captures"
-        ? { id: "captures", name: "Captures" }
+  const layer = note
+    ? layers[note.layerId] ||
+      (note.layerId === "stickies"
+        ? { id: "stickies", name: "Stickies" }
         : null)
     : null;
   const [title, setTitle] = useState(note?.title || "");
@@ -234,8 +234,8 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
           <div
             className="flex items-center gap-1.5 cursor-pointer hover:bg-gray-50 px-1 py-0.5 rounded transition-colors"
             onClick={() => {
-              if (space) {
-                setSelectedSpace(space.id);
+              if (layer) {
+                setSelectedLayer(layer.id);
                 setSelectedNote(null);
               }
             }}
@@ -243,7 +243,7 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
             <div className="w-5 h-5 bg-purple-100 rounded text-purple-600 flex items-center justify-center">
               <Home size={12} strokeWidth={2.5} />
             </div>
-            <span className="text-gray-700">{space?.name || "Workspace"}</span>
+            <span className="text-gray-700">{layer?.name || "Workspace"}</span>
           </div>
 
           {note.parentId && notes[note.parentId] && (

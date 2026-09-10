@@ -1,4 +1,4 @@
-export interface Space {
+export interface Layer {
   id: string;
   name: string;
   accentColor: string;
@@ -8,7 +8,7 @@ export interface Space {
 
 export interface Note {
   id: string;
-  spaceId: string;
+  layerId: string;
   parentId?: string;
   title: string;
   content: string; // HTML or JSON from Tiptap
@@ -18,11 +18,11 @@ export interface Note {
 }
 
 export interface AppState {
-  spaces: Record<string, Space>;
+  layers: Record<string, Layer>;
   notes: Record<string, Note>;
   
   // UI State
-  selectedSpaceId: string | null;
+  selectedLayerId: string | null;
   selectedNoteId: string | null;
   openTabs: string[];
   isSidebarOpen: boolean;

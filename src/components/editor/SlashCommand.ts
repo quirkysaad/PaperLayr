@@ -79,7 +79,7 @@ const getSuggestionItems = ({ query }: { query: string }) => {
     },
     {
       title: 'Quote',
-      description: 'Capture a quote.',
+      description: 'Sticky a quote.',
       icon: React.createElement(Quote, { size: 16 }),
       command: ({ editor, range }: any) => {
         editor.chain().focus().deleteRange(range).toggleBlockquote().run();
@@ -87,7 +87,7 @@ const getSuggestionItems = ({ query }: { query: string }) => {
     },
     {
       title: 'Code Block',
-      description: 'Capture a code snippet.',
+      description: 'Sticky a code snippet.',
       icon: React.createElement(Code, { size: 16 }),
       command: ({ editor, range }: any) => {
         editor.chain().focus().deleteRange(range).toggleCodeBlock().run();

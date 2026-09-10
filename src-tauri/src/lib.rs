@@ -22,7 +22,7 @@ pub fn run() {
                         .with_handler(|app, shortcut, event| {
                             if event.state() == ShortcutState::Pressed {
                                 if shortcut.matches(Modifiers::SUPER | Modifiers::CONTROL, Code::KeyN) {
-                                    let _ = app.emit("capture-shortcut", ());
+                                    let _ = app.emit("sticky-shortcut", ());
                                 }
                             }
                         })

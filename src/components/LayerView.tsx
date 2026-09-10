@@ -18,14 +18,14 @@ const getNoteColorClasses = (id: string) => {
   return PASTEL_COLORS[hash % PASTEL_COLORS.length];
 };
 
-export const SpaceView = ({ spaceId }: { spaceId: string }) => {
-  const { spaces, notes, openInCurrentTab, createNote, isSidebarOpen, toggleSidebar } = useStore();
-  const space = spaces[spaceId] || (spaceId === 'captures' ? { id: 'captures', name: 'Captures', accentColor: '#gray' } : null);
+export const LayerView = ({ layerId }: { layerId: string }) => {
+  const { layers, notes, openInCurrentTab, createNote, isSidebarOpen, toggleSidebar } = useStore();
+  const layer = layers[layerId] || (layerId === 'stickies' ? { id: 'stickies', name: 'Stickies', accentColor: '#gray' } : null);
 
-  if (!space) return null;
+  if (!layer) return null;
 
-  // Filter root notes for this space (we only want top-level notes in this view)
-  const spaceNotes = Object.values(notes).filter(n => n.spaceId === spaceId && !n.parentId);
+  // Filter root notes for this layer (we only want top-level notes in this view)
+  const layerNotes = Object.values(notes).filter(n => n.layerId === layerId && !n.parentId);
 
   return (
     <div className="flex-1 overflow-y-auto bg-white flex flex-col pt-8">
@@ -42,23 +42,23 @@ export const SpaceView = ({ spaceId }: { spaceId: string }) => {
       )}
 
       <div className="px-12 py-8 flex-1 max-w-5xl">
-        <h1 className="text-4xl font-bold text-gray-900 mb-12 tracking-tight">{space.name}</h1>
+        <h1 className="text-4xl font-bold text-gray-900 mb-12 tracking-tight">{layer.name}</h1>
 
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold text-gray-700">Documents</h2>
           <button
-            onClick={() => createNote(space.id)}
+            onClick={() => createNote(layer.id)}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-[14px] rounded-lg transition-colors"
           >
             <Plus size={16} /> New Document
           </button>
         </div>
 
-        {spaceNotes.length === 0 ? (
+        {layerNotes.length === 0 ? (
           <div className="py-12 text-center text-gray-500 border-2 border-dashed border-gray-100 rounded-xl">
-            <p className="mb-2 text-[15px]">No documents in this space yet.</p>
+            <p className="mb-2 text-[15px]">No documents in this layer yet.</p>
             <button
-              onClick={() => createNote(space.id)}
+              onClick={() => createNote(layer.id)}
               className="text-blue-500 font-medium hover:underline text-[15px]"
             >
               Create one
@@ -66,7 +66,7 @@ export const SpaceView = ({ spaceId }: { spaceId: string }) => {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {spaceNotes.map(note => {
+            {layerNotes.map(note => {
               const colorClasses = getNoteColorClasses(note.id);
               
               return (

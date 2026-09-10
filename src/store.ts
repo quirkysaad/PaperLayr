@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist, StateStorage, createJSONStorage } from 'zustand/middleware';
 import { get, set as idbSet, del } from 'idb-keyval';
 import { v4 as uuidv4 } from 'uuid';
-import { AppState, Note, Space } from './types';
+import { AppState, Note, Layer } from './types';
 
 // Custom storage engine using IndexedDB
 const idbStorage: StateStorage = {
@@ -19,12 +19,12 @@ const idbStorage: StateStorage = {
 
 interface Store extends AppState {
   // Actions
-  createSpace: (name: string, accentColor: string) => void;
-  renameSpace: (id: string, name: string) => void;
-  updateSpace: (id: string, updates: Partial<Space>) => void;
-  deleteSpace: (id: string) => void;
+  createLayer: (name: string, accentColor: string) => void;
+  renameLayer: (id: string, name: string) => void;
+  updateLayer: (id: string, updates: Partial<Layer>) => void;
+  deleteLayer: (id: string) => void;
   
-  createNote: (spaceId: string, parentId?: string, title?: string, preventOpenTab?: boolean) => string;
+  createNote: (layerId: string, parentId?: string, title?: string, preventOpenTab?: boolean) => string;
   updateNote: (id: string, updates: Partial<Note>) => void;
   deleteNote: (id: string) => void;
   duplicateNote: (id: string) => void;
@@ -35,7 +35,7 @@ interface Store extends AppState {
   closeTab: (id: string) => void;
   
   // UI Actions
-  setSelectedSpace: (id: string | null) => void;
+  setSelectedLayer: (id: string | null) => void;
   setSelectedNote: (id: string | null) => void;
   toggleSidebar: () => void;
   setSearchOpen: (isOpen: boolean, mode?: 'navigate' | 'newTab') => void;
@@ -46,10 +46,10 @@ interface Store extends AppState {
   openConfirm: (title: string, message: string, onConfirm: () => void) => void;
   closeConfirm: () => void;
   
-  // Space Modal
-  spaceModalConfig: { isOpen: boolean; mode: 'create' | 'edit'; spaceId?: string };
-  openSpaceModal: (mode: 'create' | 'edit', spaceId?: string) => void;
-  closeSpaceModal: () => void;
+  // Layer Modal
+  layerModalConfig: { isOpen: boolean; mode: 'create' | 'edit'; layerId?: string };
+  openLayerModal: (mode: 'create' | 'edit', layerId?: string) => void;
+  closeLayerModal: () => void;
   
   // Sidebar resizer
   sidebarWidth: number;
@@ -59,9 +59,9 @@ interface Store extends AppState {
 export const useStore = create<Store>()(
   persist(
     (set) => ({
-      spaces: {},
+      layers: {},
       notes: {},
-      selectedSpaceId: null,
+      selectedLayerId: null,
       selectedNoteId: null,
       openTabs: [],
       isSidebarOpen: true,
@@ -70,76 +70,76 @@ export const useStore = create<Store>()(
       searchMode: 'navigate',
       sidebarWidth: 256, // default to 256px (w-64)
 
-      createSpace: (name, accentColor) => {
+      createLayer: (name, accentColor) => {
         const id = uuidv4();
         const now = Date.now();
         set((state) => ({
-          spaces: {
-            ...state.spaces,
+          layers: {
+            ...state.layers,
             [id]: { id, name, accentColor, createdAt: now, updatedAt: now },
           },
-          selectedSpaceId: id,
+          selectedLayerId: id,
         }));
       },
 
-      renameSpace: (id, name) => {
+      renameLayer: (id, name) => {
         set((state) => {
-          const space = state.spaces[id];
-          if (!space) return state;
+          const layer = state.layers[id];
+          if (!layer) return state;
           return {
-            spaces: {
-              ...state.spaces,
-              [id]: { ...space, name, updatedAt: Date.now() },
+            layers: {
+              ...state.layers,
+              [id]: { ...layer, name, updatedAt: Date.now() },
             },
           };
         });
       },
 
-      updateSpace: (id, updates) => {
+      updateLayer: (id, updates) => {
         set((state) => {
-          const space = state.spaces[id];
-          if (!space) return state;
+          const layer = state.layers[id];
+          if (!layer) return state;
           return {
-            spaces: {
-              ...state.spaces,
-              [id]: { ...space, ...updates, updatedAt: Date.now() },
+            layers: {
+              ...state.layers,
+              [id]: { ...layer, ...updates, updatedAt: Date.now() },
             },
           };
         });
       },
 
-      deleteSpace: (id) => {
+      deleteLayer: (id) => {
         set((state) => {
-          const { [id]: _, ...remainingSpaces } = state.spaces;
+          const { [id]: _, ...remainingLayers } = state.layers;
           
           // Delete associated notes
           const remainingNotes = Object.fromEntries(
-            Object.entries(state.notes).filter(([_, note]) => note.spaceId !== id)
+            Object.entries(state.notes).filter(([_, note]) => note.layerId !== id)
           );
           
-          const newTabs = state.openTabs.filter(tabId => state.notes[tabId]?.spaceId !== id);
+          const newTabs = state.openTabs.filter(tabId => state.notes[tabId]?.layerId !== id);
           let newSelected = state.selectedNoteId;
-          if (state.selectedNoteId && state.notes[state.selectedNoteId]?.spaceId === id) {
+          if (state.selectedNoteId && state.notes[state.selectedNoteId]?.layerId === id) {
             newSelected = newTabs.length > 0 ? newTabs[newTabs.length - 1] : null;
           }
 
           return {
-            spaces: remainingSpaces,
+            layers: remainingLayers,
             notes: remainingNotes,
             openTabs: newTabs,
-            selectedSpaceId: state.selectedSpaceId === id ? null : state.selectedSpaceId,
+            selectedLayerId: state.selectedLayerId === id ? null : state.selectedLayerId,
             selectedNoteId: newSelected,
           };
         });
       },
 
-      createNote: (spaceId, parentId?: string, title = 'Untitled', preventOpenTab = false) => {
+      createNote: (layerId, parentId?: string, title = 'Untitled', preventOpenTab = false) => {
         const id = uuidv4();
         const now = Date.now();
         set((state) => ({
           notes: {
             ...state.notes,
-            [id]: { id, spaceId, parentId, title, content: '', createdAt: now, updatedAt: now },
+            [id]: { id, layerId, parentId, title, content: '', createdAt: now, updatedAt: now },
           },
           openTabs: preventOpenTab ? state.openTabs : [...state.openTabs, id],
           selectedNoteId: preventOpenTab ? state.selectedNoteId : id,
@@ -215,7 +215,7 @@ export const useStore = create<Store>()(
         const note = state.notes[id];
         if (!note) return state;
         const newTabs = state.openTabs.includes(id) ? state.openTabs : [...state.openTabs, id];
-        return { openTabs: newTabs, selectedNoteId: id, selectedSpaceId: note.spaceId };
+        return { openTabs: newTabs, selectedNoteId: id, selectedLayerId: note.layerId };
       }),
 
       openInCurrentTab: (id) => set((state) => {
@@ -224,7 +224,7 @@ export const useStore = create<Store>()(
         
         if (state.openTabs.includes(id)) {
           // If it's already open, just switch to it
-          return { selectedNoteId: id, selectedSpaceId: note.spaceId };
+          return { selectedNoteId: id, selectedLayerId: note.layerId };
         }
         
         // Otherwise, replace current tab with this note
@@ -240,7 +240,7 @@ export const useStore = create<Store>()(
           newTabs.push(id);
         }
         
-        return { openTabs: newTabs, selectedNoteId: id, selectedSpaceId: note.spaceId };
+        return { openTabs: newTabs, selectedNoteId: id, selectedLayerId: note.layerId };
       }),
 
       closeTab: (id) => set((state) => {
@@ -252,7 +252,7 @@ export const useStore = create<Store>()(
         return { openTabs: newTabs, selectedNoteId: newSelected };
       }),
 
-      setSelectedSpace: (id) => set({ selectedSpaceId: id }),
+      setSelectedLayer: (id) => set({ selectedLayerId: id }),
       setSelectedNote: (id) => set({ selectedNoteId: id }),
       toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
       setSearchOpen: (isOpen, mode = 'navigate') => set((state) => ({ 
@@ -267,17 +267,63 @@ export const useStore = create<Store>()(
       openConfirm: (title, message, onConfirm) => set({ confirmModal: { title, message, onConfirm } }),
       closeConfirm: () => set({ confirmModal: null }),
 
-      spaceModalConfig: { isOpen: false, mode: 'create' },
-      openSpaceModal: (mode, spaceId) => set({ spaceModalConfig: { isOpen: true, mode, spaceId } }),
-      closeSpaceModal: () => set({ spaceModalConfig: { isOpen: false, mode: 'create' } }),
+      layerModalConfig: { isOpen: false, mode: 'create' },
+      openLayerModal: (mode, layerId) => set({ layerModalConfig: { isOpen: true, mode, layerId } }),
+      closeLayerModal: () => set({ layerModalConfig: { isOpen: false, mode: 'create' } }),
     }),
     {
       name: 'paperlayr-storage',
       storage: createJSONStorage(() => idbStorage),
+      version: 2,
+      migrate: (persistedState: any, version: number) => {
+        if (version === 0 || version === 1) {
+          if (persistedState.spaces) {
+            persistedState.layers = persistedState.spaces;
+            delete persistedState.spaces;
+          }
+          if (persistedState.selectedSpaceId) {
+            persistedState.selectedLayerId = persistedState.selectedSpaceId === 'captures' ? 'stickies' : persistedState.selectedSpaceId;
+            delete persistedState.selectedSpaceId;
+          }
+          if (persistedState.notes) {
+            const validLayerIds = new Set([
+              ...(persistedState.layers ? Object.keys(persistedState.layers) : []),
+              'stickies'
+            ]);
+            
+            let recoveredLayerId = null;
+
+            Object.values(persistedState.notes).forEach((note: any) => {
+              if (note.spaceId) {
+                note.layerId = note.spaceId === 'captures' ? 'stickies' : note.spaceId;
+                delete note.spaceId;
+              }
+              
+              // Rescue orphaned notes
+              if (note.layerId && !validLayerIds.has(note.layerId)) {
+                if (!recoveredLayerId) {
+                  recoveredLayerId = "recovered-" + Date.now();
+                  persistedState.layers = persistedState.layers || {};
+                  persistedState.layers[recoveredLayerId] = {
+                    id: recoveredLayerId,
+                    name: "Recovered Notes",
+                    accentColor: "#f59e0b",
+                    createdAt: Date.now(),
+                    updatedAt: Date.now()
+                  };
+                  validLayerIds.add(recoveredLayerId);
+                }
+                note.layerId = recoveredLayerId;
+              }
+            });
+          }
+        }
+        return persistedState;
+      },
       partialize: (state) => ({
-        spaces: state.spaces,
+        layers: state.layers,
         notes: state.notes,
-                selectedSpaceId: state.selectedSpaceId,
+                selectedLayerId: state.selectedLayerId,
         selectedNoteId: state.selectedNoteId,
         openTabs: state.openTabs,
         isSidebarOpen: state.isSidebarOpen,

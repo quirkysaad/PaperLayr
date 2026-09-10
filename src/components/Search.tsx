@@ -8,9 +8,9 @@ export const Search = () => {
     searchQuery, 
     setSearchOpen, 
     setSearchQuery,
-    spaces,
+    layers,
     notes,
-    setSelectedSpace,
+    setSelectedLayer,
     setSelectedNote,
     openTab,
     openInCurrentTab,
@@ -45,26 +45,26 @@ export const Search = () => {
 
   const query = searchQuery.toLowerCase();
   
-  let results: { id: string, type: 'space'|'note', title: string, subtitle?: string, spaceId: string }[] = [];
+  let results: { id: string, type: 'layer'|'note', title: string, subtitle?: string, layerId: string }[] = [];
   
   if (query.trim()) {
-    // Search spaces
-    Object.values(spaces).forEach(space => {
-      if (space.name.toLowerCase().includes(query)) {
-        results.push({ id: space.id, type: 'space', title: space.name, spaceId: space.id });
+    // Search layers
+    Object.values(layers).forEach(layer => {
+      if (layer.name.toLowerCase().includes(query)) {
+        results.push({ id: layer.id, type: 'layer', title: layer.name, layerId: layer.id });
       }
     });
 
     // Search notes
     Object.values(notes).forEach(note => {
       if (note.title.toLowerCase().includes(query) || note.content.toLowerCase().includes(query)) {
-        const spaceName = note.spaceId === 'captures' ? 'Captures' : (spaces[note.spaceId]?.name || 'Unknown Space');
+        const layerName = note.layerId === 'stickies' ? 'Stickies' : (layers[note.layerId]?.name || 'Unknown Layer');
         results.push({ 
           id: note.id, 
           type: 'note', 
           title: note.title || 'Untitled', 
-          subtitle: `in ${spaceName}`,
-          spaceId: note.spaceId 
+          subtitle: `in ${layerName}`,
+          layerId: note.layerId 
         });
       }
     });
@@ -78,7 +78,7 @@ export const Search = () => {
         openInCurrentTab(result.id);
       }
     } else {
-      setSelectedSpace(result.spaceId);
+      setSelectedLayer(result.layerId);
       setSelectedNote(null);
     }
     setSearchOpen(false);
@@ -96,7 +96,7 @@ export const Search = () => {
             ref={inputRef}
             type="text"
             className="flex-1 bg-transparent border-none outline-none text-lg text-gray-900 placeholder-gray-400"
-            placeholder={searchMode === 'newTab' ? "Search notes to open in new tab..." : "Search spaces and notes..."}
+            placeholder={searchMode === 'newTab' ? "Search notes to open in new tab..." : "Search layers and notes..."}
             value={searchQuery}
             onChange={e => { setSearchQuery(e.target.value); setSelectedIndex(0); }}
             onKeyDown={e => {
@@ -127,7 +127,7 @@ export const Search = () => {
                   onClick={() => handleSelectResult(result)}
                 >
                   <div className="mr-4 text-gray-400">
-                    {result.type === 'space' && <Folder size={18} />}
+                    {result.type === 'layer' && <Folder size={18} />}
                     {result.type === 'note' && <FileText size={18} />}
                   </div>
                   <div>

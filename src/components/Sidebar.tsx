@@ -23,27 +23,27 @@ import {
 } from "lucide-react";
 import { useStore } from "../store";
 
-import { Space } from "../types";
+import { Layer } from "../types";
 
 export const Sidebar = () => {
   const { openTab, openInCurrentTab, openTabs } = useStore();
   const {
-    spaces,
+    layers,
     notes,
-    selectedSpaceId,
+    selectedLayerId,
     selectedNoteId,
-    setSelectedSpace,
+    setSelectedLayer,
     setSelectedNote,
-    createSpace,
+    createLayer,
     createNote,
     updateNote,
     deleteNote,
     duplicateNote,
-    deleteSpace,
-    renameSpace,
+    deleteLayer,
+    renameLayer,
     setSearchOpen,
     openConfirm,
-    openSpaceModal,
+    openLayerModal,
     sidebarWidth,
     setSidebarWidth,
     toggleSidebar,
@@ -67,24 +67,24 @@ export const Sidebar = () => {
   };
 
   const favoriteNotes = Object.values(notes).filter((n) => n.isFavorite);
-  const captureNotes = Object.values(notes).filter(
-    (n) => n.spaceId === "captures",
+  const stickyNotes = Object.values(notes).filter(
+    (n) => n.layerId === "stickies",
   );
 
-  const [expandedSpaces, setExpandedSpaces] = useState<Record<string, boolean>>(
+  const [expandedLayers, setExpandedLayers] = useState<Record<string, boolean>>(
     {},
   );
   const [expandedNotes, setExpandedNotes] = useState<Record<string, boolean>>(
     {},
   );
 
-  const [editingSpaceId, setEditingSpaceId] = useState<string | null>(null);
-  const [editSpaceName, setEditSpaceName] = useState("");
+  const [editingLayerId, setEditingLayerId] = useState<string | null>(null);
+  const [editLayerName, setEditLayerName] = useState("");
 
-  const [contextMenuSpaceId, setContextMenuSpaceId] = useState<string | null>(
+  const [contextMenuLayerId, setContextMenuLayerId] = useState<string | null>(
     null,
   );
-  const [addMenuSpaceId, setAddMenuSpaceId] = useState<string | null>(null);
+  const [addMenuLayerId, setAddMenuLayerId] = useState<string | null>(null);
 
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [editNoteName, setEditNoteName] = useState("");
@@ -108,8 +108,8 @@ export const Sidebar = () => {
     setMenuPos({ top: rect.bottom + 4, left: rect.left });
 
     // Close others
-    setContextMenuSpaceId(null);
-    setAddMenuSpaceId(null);
+    setContextMenuLayerId(null);
+    setAddMenuLayerId(null);
     setContextMenuNoteId(null);
     setAddMenuNoteId(null);
     setShowMoveMenuForNoteId(null);
@@ -118,9 +118,9 @@ export const Sidebar = () => {
     setter(id);
   };
 
-  const toggleSpace = (id: string, e: React.MouseEvent) => {
+  const toggleLayer = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setExpandedSpaces((prev) => ({ ...prev, [id]: !prev[id] }));
+    setExpandedLayers((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   const toggleNote = (id: string, e: React.MouseEvent) => {
@@ -128,23 +128,23 @@ export const Sidebar = () => {
     setExpandedNotes((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleCreateSpace = () => {
-    openSpaceModal("create");
+  const handleCreateLayer = () => {
+    openLayerModal("create");
   };
 
-  const handleCreateNote = (spaceId: string, e: React.MouseEvent) => {
+  const handleCreateNote = (layerId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!expandedSpaces[spaceId]) {
-      setExpandedSpaces((prev) => ({ ...prev, [spaceId]: true }));
+    if (!expandedLayers[layerId]) {
+      setExpandedLayers((prev) => ({ ...prev, [layerId]: true }));
     }
-    const noteId = createNote(spaceId, undefined);
-    setSelectedSpace(spaceId);
+    const noteId = createNote(layerId, undefined);
+    setSelectedLayer(layerId);
     setSelectedNote(noteId);
-    setAddMenuSpaceId(null);
+    setAddMenuLayerId(null);
   };
 
   const handleCreateNestedNote = (
-    spaceId: string,
+    layerId: string,
     parentId: string,
     e: React.MouseEvent,
   ) => {
@@ -152,35 +152,35 @@ export const Sidebar = () => {
     if (!expandedNotes[parentId]) {
       setExpandedNotes((prev) => ({ ...prev, [parentId]: true }));
     }
-    const noteId = createNote(spaceId, parentId);
-    setSelectedSpace(spaceId);
+    const noteId = createNote(layerId, parentId);
+    setSelectedLayer(layerId);
     setSelectedNote(noteId);
     setContextMenuNoteId(null);
   };
 
-  const startRenameSpace = (space: Space, e: React.MouseEvent) => {
+  const startRenameLayer = (layer: Layer, e: React.MouseEvent) => {
     e.stopPropagation();
-    setEditingSpaceId(space.id);
-    setEditSpaceName(space.name);
-    setContextMenuSpaceId(null);
+    setEditingLayerId(layer.id);
+    setEditLayerName(layer.name);
+    setContextMenuLayerId(null);
   };
 
-  const submitRenameSpace = (id: string) => {
-    if (editingSpaceId !== id) return;
-    if (editSpaceName.trim()) {
-      renameSpace(id, editSpaceName.trim());
+  const submitRenameLayer = (id: string) => {
+    if (editingLayerId !== id) return;
+    if (editLayerName.trim()) {
+      renameLayer(id, editLayerName.trim());
     }
-    setEditingSpaceId(null);
+    setEditingLayerId(null);
   };
 
-  const handleDeleteSpace = (id: string, e: React.MouseEvent) => {
+  const handleDeleteLayer = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     openConfirm(
-      "Delete Space",
-      "Are you sure you want to delete this space and all its contents? This action cannot be undone.",
-      () => deleteSpace(id),
+      "Delete Layer",
+      "Are you sure you want to delete this layer and all its contents? This action cannot be undone.",
+      () => deleteLayer(id),
     );
-    setContextMenuSpaceId(null);
+    setContextMenuLayerId(null);
   };
 
   const startRenameNote = (
@@ -211,17 +211,17 @@ export const Sidebar = () => {
       () => {
         deleteNote(id);
 
-        // Auto-delete space if empty
-        const spaceNotes = Object.values(notes).filter(
-          (n) => n.spaceId === note.spaceId && n.id !== id,
+        // Auto-delete layer if empty
+        const layerNotes = Object.values(notes).filter(
+          (n) => n.layerId === note.layerId && n.id !== id,
         );
-        if (spaceNotes.length === 0) {
-          deleteSpace(note.spaceId);
+        if (layerNotes.length === 0) {
+          deleteLayer(note.layerId);
         } else if (selectedNoteId === id) {
-          if (spaceNotes.length > 0) {
-            setSelectedNote(spaceNotes[0].id);
+          if (layerNotes.length > 0) {
+            setSelectedNote(layerNotes[0].id);
           } else {
-            setSelectedSpace(null);
+            setSelectedLayer(null);
           }
         }
       },
@@ -245,32 +245,32 @@ export const Sidebar = () => {
     setContextMenuNoteId(null);
   };
 
-  const handleMoveNote = (noteId: string, newSpaceId: string) => {
-    // We should move this note to the root of the new space
-    updateNote(noteId, { spaceId: newSpaceId, parentId: undefined });
+  const handleMoveNote = (noteId: string, newLayerId: string) => {
+    // We should move this note to the root of the new layer
+    updateNote(noteId, { layerId: newLayerId, parentId: undefined });
 
-    // Also update spaceId for all descendant notes to keep them attached
-    const updateDescendantsSpace = (parentId: string, newSpace: string) => {
+    // Also update layerId for all descendant notes to keep them attached
+    const updateDescendantsLayer = (parentId: string, newLayer: string) => {
       Object.values(notes)
         .filter((n) => n.parentId === parentId)
         .forEach((child) => {
-          updateNote(child.id, { spaceId: newSpace });
-          updateDescendantsSpace(child.id, newSpace);
+          updateNote(child.id, { layerId: newLayer });
+          updateDescendantsLayer(child.id, newLayer);
         });
     };
-    updateDescendantsSpace(noteId, newSpaceId);
+    updateDescendantsLayer(noteId, newLayerId);
 
     setContextMenuNoteId(null);
     setShowMoveMenuForNoteId(null);
   };
 
-  const spaceList = Object.values(spaces).sort(
+  const layerList = Object.values(layers).sort(
     (a, b) => a.createdAt - b.createdAt,
   );
 
   const renderNoteItem = (
     note: Note,
-    sectionName: "favorites" | "captures" | "default" = "default",
+    sectionName: "favorites" | "stickies" | "default" = "default",
     depth: number = 0,
   ) => {
     const isSpecialSection = sectionName !== "default";
@@ -432,14 +432,14 @@ export const Sidebar = () => {
               {/* Move Submenu */}
               {showMoveMenuForNoteId === contextId && (
                 <div className="absolute left-full top-0 ml-1 w-40 bg-white rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.08)] border border-gray-100 py-1.5 z-50">
-                  {Object.values(spaces).filter((s) => s.id !== note.spaceId)
+                  {Object.values(layers).filter((s) => s.id !== note.layerId)
                     .length === 0 ? (
                     <div className="px-3 py-1.5 text-[13px] text-gray-400 italic">
-                      No other spaces
+                      No other layers
                     </div>
                   ) : (
-                    Object.values(spaces)
-                      .filter((s) => s.id !== note.spaceId)
+                    Object.values(layers)
+                      .filter((s) => s.id !== note.layerId)
                       .map((s) => (
                         <button
                           key={s.id}
@@ -485,7 +485,7 @@ export const Sidebar = () => {
             <button
               className="w-full text-left px-3 py-1.5 text-[14px] text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 font-medium"
               onClick={(e) => {
-                handleCreateNestedNote(note.spaceId, note.id, e);
+                handleCreateNestedNote(note.layerId, note.id, e);
                 setAddMenuNoteId(null);
               }}
             >
@@ -524,7 +524,7 @@ export const Sidebar = () => {
         onMouseDown={startResizing}
       />
 
-      <div className="px-4 mt-2">
+      <div className="px-4">
         <div className="flex items-center justify-between">
           <span className="font-bold text-[15px] text-gray-800">PaperLayr</span>
           <div className="flex items-center gap-2 text-gray-500">
@@ -552,64 +552,64 @@ export const Sidebar = () => {
           </div>
         )}
 
-        {captureNotes.length > 0 && (
+        {stickyNotes.length > 0 && (
           <div className="mb-6">
             <div className="flex items-center justify-between px-5 mb-2 group">
               <span className="text-[13px] text-gray-400 tracking-wider font-medium">
-                CAPTURES
+                STICKIES
               </span>
             </div>
             <div className="px-3 space-y-0.5">
-              {captureNotes.map((note) => renderNoteItem(note, "captures"))}
+              {stickyNotes.map((note) => renderNoteItem(note, "stickies"))}
             </div>
           </div>
         )}
 
         <div className="flex items-center justify-between px-5 mb-2 group">
           <span className="text-[13px] text-gray-400 tracking-wider font-medium">
-            SPACES
+            LAYERS
           </span>
           <button
-            onClick={handleCreateSpace}
+            onClick={handleCreateLayer}
             className="text-gray-400 hover:text-gray-600 p-0.5 rounded cursor-pointer"
           >
             <Plus size={18} strokeWidth={2} />
           </button>
         </div>
 
-        {spaceList.map((space) => {
-          const isSpaceViewActive =
-            selectedSpaceId === space.id && !selectedNoteId;
-          const isSpaceParentActive =
-            selectedSpaceId === space.id && !!selectedNoteId;
+        {layerList.map((layer) => {
+          const isLayerViewActive =
+            selectedLayerId === layer.id && !selectedNoteId;
+          const isLayerParentActive =
+            selectedLayerId === layer.id && !!selectedNoteId;
 
-          let spaceClassName =
+          let layerClassName =
             "text-gray-600 hover:bg-gray-100 border border-transparent";
-          if (isSpaceViewActive) {
-            spaceClassName =
+          if (isLayerViewActive) {
+            layerClassName =
               "bg-[#E5E7EB] text-gray-900 border border-transparent";
-          } else if (isSpaceParentActive) {
-            spaceClassName =
+          } else if (isLayerParentActive) {
+            layerClassName =
               "border border-dashed text-gray-800 bg-gray-50/50 hover:bg-gray-100";
           }
 
           return (
-            <div key={space.id} className="mb-1">
+            <div key={layer.id} className="mb-1">
               <div
-                className={`group flex items-center gap-1.5 px-2 py-1 mx-1 rounded-md cursor-pointer text-[15px] font-medium transition-colors ${spaceClassName}`}
+                className={`group flex items-center gap-1.5 px-2 py-1 mx-1 rounded-md cursor-pointer text-[15px] font-medium transition-colors ${layerClassName}`}
                 style={
-                  isSpaceParentActive
-                    ? { borderColor: space.accentColor || "#d1d5db" }
+                  isLayerParentActive
+                    ? { borderColor: layer.accentColor || "#d1d5db" }
                     : undefined
                 }
                 onClick={(e) => {
-                  toggleSpace(space.id, e);
-                  setSelectedSpace(space.id);
+                  toggleLayer(layer.id, e);
+                  setSelectedLayer(layer.id);
                   setSelectedNote(null);
                 }}
               >
                 <div className="text-gray-400 mr-0.5">
-                  {expandedSpaces[space.id] !== false ? (
+                  {expandedLayers[layer.id] !== false ? (
                     <ChevronDown size={16} strokeWidth={1.5} />
                   ) : (
                     <ChevronRight size={16} strokeWidth={1.5} />
@@ -617,19 +617,19 @@ export const Sidebar = () => {
                 </div>
                 <div
                   className="w-2.5 h-2.5 rounded-full mr-1 flex-shrink-0"
-                  style={{ backgroundColor: space.accentColor || "#d1d5db" }}
+                  style={{ backgroundColor: layer.accentColor || "#d1d5db" }}
                 />
-                <span className="flex-1 truncate">{space.name}</span>
+                <span className="flex-1 truncate">{layer.name}</span>
 
                 <div
-                  className={`flex items-center transition-opacity ${contextMenuSpaceId === space.id || addMenuSpaceId === space.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+                  className={`flex items-center transition-opacity ${contextMenuLayerId === layer.id || addMenuLayerId === layer.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
                 >
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      addMenuSpaceId === space.id
-                        ? setAddMenuSpaceId(null)
-                        : openMenu(e, setAddMenuSpaceId, space.id);
+                      addMenuLayerId === layer.id
+                        ? setAddMenuLayerId(null)
+                        : openMenu(e, setAddMenuLayerId, layer.id);
                     }}
                     className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-700 mr-0.5"
                     title="Add new note"
@@ -639,9 +639,9 @@ export const Sidebar = () => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      contextMenuSpaceId === space.id
-                        ? setContextMenuSpaceId(null)
-                        : openMenu(e, setContextMenuSpaceId, space.id);
+                      contextMenuLayerId === layer.id
+                        ? setContextMenuLayerId(null)
+                        : openMenu(e, setContextMenuLayerId, layer.id);
                     }}
                     className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-700"
                   >
@@ -651,7 +651,7 @@ export const Sidebar = () => {
               </div>
 
               {/* Add Note Menu */}
-              {addMenuSpaceId === space.id && (
+              {addMenuLayerId === layer.id && (
                 <div
                   className="fixed w-40 bg-white rounded-md shadow-lg border border-gray-100 z-50 py-1"
                   style={{ top: menuPos.top, left: menuPos.left }}
@@ -660,8 +660,8 @@ export const Sidebar = () => {
                   <button
                     className="w-full text-left px-3 py-1.5 text-[13px] text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                     onClick={(e) => {
-                      handleCreateNote(space.id, e);
-                      setAddMenuSpaceId(null);
+                      handleCreateNote(layer.id, e);
+                      setAddMenuLayerId(null);
                     }}
                   >
                     <FileText size={14} /> Empty Note
@@ -670,7 +670,7 @@ export const Sidebar = () => {
               )}
 
               {/* Context Menu */}
-              {contextMenuSpaceId === space.id && (
+              {contextMenuLayerId === layer.id && (
                 <div
                   className="fixed w-32 bg-white rounded-md shadow-lg border border-gray-100 z-50 py-1"
                   style={{ top: menuPos.top, left: menuPos.left }}
@@ -680,8 +680,8 @@ export const Sidebar = () => {
                     className="w-full text-left px-3 py-1.5 text-[13px] text-gray-700 hover:bg-gray-50 flex items-center gap-2"
                     onClick={(e) => {
                       e.stopPropagation();
-                      openSpaceModal("edit", space.id);
-                      setContextMenuSpaceId(null);
+                      openLayerModal("edit", layer.id);
+                      setContextMenuLayerId(null);
                     }}
                   >
                     <Edit2 size={14} /> Edit
@@ -690,7 +690,7 @@ export const Sidebar = () => {
                     className="w-full text-left px-3 py-1.5 text-[13px] text-red-500 hover:bg-gray-50 flex items-center gap-2"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleDeleteSpace(space.id, e);
+                      handleDeleteLayer(layer.id, e);
                     }}
                   >
                     <Trash2 size={14} /> Delete
@@ -698,11 +698,11 @@ export const Sidebar = () => {
                 </div>
               )}
 
-              {/* Space Notes */}
-              {expandedSpaces[space.id] !== false && (
+              {/* Layer Notes */}
+              {expandedLayers[layer.id] !== false && (
                 <div className="ml-[22px] pl-2 border-l border-gray-200 my-1 space-y-0.5 pr-2">
                   {Object.values(notes)
-                    .filter((n) => n.spaceId === space.id && !n.parentId)
+                    .filter((n) => n.layerId === layer.id && !n.parentId)
                     .sort((a, b) => a.createdAt - b.createdAt)
                     .map((note) => renderNoteItem(note, "default"))}
                 </div>
@@ -713,15 +713,15 @@ export const Sidebar = () => {
       </div>
 
       {/* Click outside context menus */}
-      {(contextMenuSpaceId ||
-        addMenuSpaceId ||
+      {(contextMenuLayerId ||
+        addMenuLayerId ||
         contextMenuNoteId ||
         addMenuNoteId) && (
         <div
           className="fixed inset-0 z-40"
           onClick={() => {
-            setContextMenuSpaceId(null);
-            setAddMenuSpaceId(null);
+            setContextMenuLayerId(null);
+            setAddMenuLayerId(null);
             setContextMenuNoteId(null);
             setAddMenuNoteId(null);
             setShowMoveMenuForNoteId(null);

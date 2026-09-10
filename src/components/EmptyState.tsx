@@ -1,10 +1,10 @@
 import { Plus, ChevronsRight } from 'lucide-react';
 import { useStore } from '../store';
 
-export const EmptyState = ({ type }: { type: 'no-space' | 'no-note' }) => {
-  const { openSpaceModal, isSidebarOpen, toggleSidebar } = useStore();
+export const EmptyState = ({ type }: { type: 'no-layer' | 'no-note' }) => {
+  const { openLayerModal, isSidebarOpen, toggleSidebar } = useStore();
 
-  if (type === 'no-space') {
+  if (type === 'no-layer') {
     return (
       <div className="flex-1 h-screen flex flex-col bg-paper text-gray-500 relative">
         <div data-tauri-drag-region className="h-[48px] w-full absolute top-0 left-0 drag-region flex items-end pb-2.5 px-2">
@@ -27,13 +27,13 @@ export const EmptyState = ({ type }: { type: 'no-space' | 'no-note' }) => {
           </svg>
         </div>
         <h2 className="text-xl font-medium text-ink mb-2">Nothing here yet</h2>
-        <p className="text-sm mb-6 text-center max-w-sm">Create a space to start writing.</p>
+        <p className="text-sm mb-6 text-center max-w-sm">Create a layer to start writing.</p>
         <button 
-          onClick={() => openSpaceModal('create')}
+          onClick={() => openLayerModal('create')}
           className="flex items-center gap-2 px-4 py-2 bg-accent hover:bg-accent-hover text-white rounded-md font-medium transition-colors"
         >
           <Plus size={18} />
-          Create Space
+          Create Layer
         </button>
         </div>
       </div>

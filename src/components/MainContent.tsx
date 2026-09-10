@@ -2,18 +2,18 @@ import { useStore } from '../store';
 import { NoteEditor } from './NoteEditor';
 import { EmptyState } from './EmptyState';
 import { TabBar } from './TabBar';
-import { SpaceView } from './SpaceView';
+import { LayerView } from './LayerView';
 
 export const MainContent = () => {
-  const { spaces, selectedSpaceId, selectedNoteId } = useStore();
+  const { layers, selectedLayerId, selectedNoteId } = useStore();
 
-  if (!selectedSpaceId) {
-    return <EmptyState type="no-space" />;
+  if (!selectedLayerId) {
+    return <EmptyState type="no-layer" />;
   }
 
-  const space = spaces[selectedSpaceId];
-  if (!space && selectedSpaceId !== 'captures') {
-    return <EmptyState type="no-space" />;
+  const layer = layers[selectedLayerId];
+  if (!layer && selectedLayerId !== 'stickies') {
+    return <EmptyState type="no-layer" />;
   }
 
   return (
@@ -22,7 +22,7 @@ export const MainContent = () => {
       {selectedNoteId ? (
         <NoteEditor noteId={selectedNoteId} />
       ) : (
-        <SpaceView spaceId={selectedSpaceId} />
+        <LayerView layerId={selectedLayerId} />
       )}
     </div>
   );
