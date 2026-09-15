@@ -50,6 +50,7 @@ pub fn run() {
                         _ => {}
                     })
                     .build(app)?;
+                app.handle().plugin(tauri_plugin_updater::Builder::new().build())?;
             }
             Ok(())
         })
@@ -63,6 +64,7 @@ pub fn run() {
             _ => {}
         })
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_process::init())
         .invoke_handler(tauri::generate_handler![greet])
         .build(tauri::generate_context!())
         .expect("error while running tauri application")

@@ -20,8 +20,13 @@ import {
   Copy,
   FolderInput,
   ChevronsLeft,
+  RefreshCw,
+  ExternalLink,
+  Sparkles,
 } from "lucide-react";
 import { useStore } from "../store";
+import { useUpdater } from "../hooks/useUpdater";
+import { openUrl } from "@tauri-apps/plugin-opener";
 
 import { Layer } from "../types";
 import { useShallow } from "zustand/react/shallow";
@@ -142,6 +147,28 @@ export const Sidebar = () => {
 
     // Open target
     setter(id);
+  };
+
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [settingsMenuPos, setSettingsMenuPos] = useState({ top: 0, left: 0 });
+  const { hasUpdate, currentVersion, checkForUpdates } = useUpdater();
+
+  const openSettingsMenu = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const rect = e.currentTarget.getBoundingClientRect();
+    setSettingsMenuPos({
+      top: rect.bottom + 6,
+      left: Math.max(8, rect.left - 180 + rect.width),
+    });
+
+    // Close other menus
+    setContextMenuLayerId(null);
+    setAddMenuLayerId(null);
+    setContextMenuNoteId(null);
+    setAddMenuNoteId(null);
+    setShowMoveMenuForNoteId(null);
+
+    setIsSettingsOpen((prev) => !prev);
   };
 
   const toggleLayer = (id: string, e: React.MouseEvent) => {
@@ -553,13 +580,85 @@ export const Sidebar = () => {
       <div className="px-4">
         <div className="flex items-center justify-between">
           <span className="font-bold text-[15px] text-gray-800">PaperLayr</span>
-          <div className="flex items-center gap-2 text-gray-500">
+          <div className="flex items-center gap-1.5 text-gray-500">
             <button
               onClick={() => setSearchOpen(true)}
-              className="hover:text-gray-800 hover:bg-gray-100 p-1.5 rounded"
+              className="hover:text-gray-800 hover:bg-gray-100 p-1.5 rounded transition-colors"
+              title="Search notes"
             >
               <Search size={18} strokeWidth={1.5} />
             </button>
+            <div className="relative">
+              <button
+                onClick={openSettingsMenu}
+                className={`p-1.5 rounded transition-colors relative ${
+                  isSettingsOpen
+                    ? "text-gray-900 bg-gray-200"
+                    : "hover:text-gray-800 hover:bg-gray-100 text-gray-500"
+                }`}
+                title="Settings & Updates"
+              >
+                <Settings size={18} strokeWidth={1.5} />
+                {hasUpdate && (
+                  <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-blue-600 ring-2 ring-white" />
+                )}
+              </button>
+
+              {isSettingsOpen && (
+                <div
+                  className="fixed w-56 bg-white rounded-xl shadow-[0_10px_38px_rgba(0,0,0,0.15)] border border-gray-100 py-1.5 z-50 text-[13px]"
+                  style={{ top: settingsMenuPos.top, left: settingsMenuPos.left }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="px-3.5 py-2 border-b border-gray-100 flex items-center justify-between">
+                    <div>
+                      <div className="font-semibold text-gray-800">PaperLayr</div>
+                      <div className="text-[11px] text-gray-400">v{currentVersion}</div>
+                    </div>
+                    {hasUpdate && (
+                      <span className="text-[11px] bg-blue-50 text-blue-600 font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <Sparkles size={10} /> Update
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="py-1">
+                    <button
+                      onClick={() => {
+                        setIsSettingsOpen(false);
+                        checkForUpdates();
+                      }}
+                      className="w-full text-left px-3.5 py-2 text-gray-700 hover:bg-gray-50 flex items-center justify-between transition-colors"
+                    >
+                      <span className="flex items-center gap-2">
+                        <RefreshCw size={14} className="text-gray-400" />
+                        Check for Updates...
+                      </span>
+                      {hasUpdate && (
+                        <span className="w-2 h-2 rounded-full bg-blue-600" />
+                      )}
+                    </button>
+
+                    <button
+                      onClick={async () => {
+                        setIsSettingsOpen(false);
+                        try {
+                          await openUrl("https://github.com/quirkysaad/PaperLayr");
+                        } catch {
+                          window.open("https://github.com/quirkysaad/PaperLayr", "_blank");
+                        }
+                      }}
+                      className="w-full text-left px-3.5 py-2 text-gray-700 hover:bg-gray-50 flex items-center justify-between transition-colors"
+                    >
+                      <span className="flex items-center gap-2">
+                        <ExternalLink size={14} className="text-gray-400" />
+                        GitHub Repository
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -742,7 +841,8 @@ export const Sidebar = () => {
       {(contextMenuLayerId ||
         addMenuLayerId ||
         contextMenuNoteId ||
-        addMenuNoteId) && (
+        addMenuNoteId ||
+        isSettingsOpen) && (
         <div
           className="fixed inset-0 z-40"
           onClick={() => {
@@ -751,6 +851,7 @@ export const Sidebar = () => {
             setContextMenuNoteId(null);
             setAddMenuNoteId(null);
             setShowMoveMenuForNoteId(null);
+            setIsSettingsOpen(false);
           }}
         />
       )}

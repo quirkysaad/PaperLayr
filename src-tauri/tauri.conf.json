@@ -34,6 +34,15 @@
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEE4NkE4RTIzNERENUQ5MApSV1NRWGQwMDRxaUdDbUhlRzd6bHVqN0pQWTNSTFF1UGNBaWdKSjBhaWxLQllzOXNEUS81MmpNUQo=",
+      "endpoints": [
+        "https://github.com/quirkysaad/PaperLayr/releases/latest/download/latest.json"
+      ]
+    }
   }
 }

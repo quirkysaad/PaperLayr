@@ -8,8 +8,10 @@ import { MainContent } from "./components/MainContent";
 import { Search } from "./components/Search";
 import { ConfirmModal } from "./components/ConfirmModal";
 import { LayerModal } from "./components/LayerModal";
+import { UpdateModal } from "./components/UpdateModal";
 import { Widget } from "./components/Widget";
 import { useStore } from "./store";
+import { useUpdater } from "./hooks/useUpdater";
 import { useShallow } from "zustand/react/shallow";
 
 function App() {
@@ -19,6 +21,7 @@ function App() {
   })));
   const urlParams = new URLSearchParams(window.location.search);
   const widgetId = urlParams.get("widget");
+  const isStickyMode = urlParams.get("sticky") === "true";
 
   // Create default layer on first launch if nothing exists
   useEffect(() => {
@@ -34,6 +37,16 @@ function App() {
       }, 100);
     }
   }, [layers]);
+
+  // Check for updates on initial app launch
+  useEffect(() => {
+    if (widgetId || isStickyMode) return;
+    const timer = setTimeout(() => {
+      useUpdater.getState().checkForUpdates({ silentIfLatest: true });
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [widgetId, isStickyMode]);
 
   // Global Sync Listeners
   useEffect(() => {
@@ -161,7 +174,6 @@ function App() {
     });
   };
 
-  const isStickyMode = urlParams.get("sticky") === "true";
   if (widgetId || isStickyMode) {
     return <Widget noteId={widgetId || undefined} isSticky={isStickyMode} />;
   }
@@ -173,6 +185,7 @@ function App() {
       <Search />
       <ConfirmModal />
       <LayerModal />
+      <UpdateModal />
     </div>
   );
 }
