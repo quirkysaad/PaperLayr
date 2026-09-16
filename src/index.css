@@ -1,22 +1,40 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --color-primary: #1F2937;
-  --color-primary-hover: #374151;
-  --color-bg-sidebar: #F9FAFB;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --color-primary: #18181B;
+  --color-primary-hover: #27272A;
+  --color-bg-sidebar: #F8F9FA;
   --color-bg-main: #FFFFFF;
-  --color-text-primary: #333333;
-  --color-text-secondary: #4B5563;
-  --color-border: #E5E7EB;
-  --color-item-hover: #F3F4F6;
-  --color-item-selected: #E5E7EB;
+  --color-text-primary: #18181B;
+  --color-text-secondary: #52525B;
+  --color-text-muted: #71717A;
+  --color-border: #E4E4E7;
+  --color-item-hover: #F4F4F5;
+  --color-item-selected: #E4E4E7;
 }
 
 @layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
   body {
     @apply text-[var(--color-text-primary)] bg-[var(--color-bg-main)] m-0 p-0 overflow-hidden font-sans;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
+
+  ::selection {
+    background-color: rgba(59, 130, 246, 0.22);
+    color: inherit;
+  }
+
   body.is-widget,
   html.is-widget,
   html:has(body.is-widget) {
@@ -24,69 +42,83 @@
     background-color: transparent !important;
   }
 
-  /* Scrollbar styles */
+  /* Refined, minimal modern scrollbars */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
   ::-webkit-scrollbar-track {
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 rounded-full;
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-400;
+    background: rgba(0, 0, 0, 0.25);
   }
 
-  /* Tiptap editor styles */
+  /* Tiptap & ProseMirror editorial styling */
   .ProseMirror {
     @apply outline-none min-h-[500px];
+    caret-color: #2563EB;
   }
   
   .ProseMirror p.is-editor-empty:first-child::before {
-    @apply text-gray-400 float-left h-0 pointer-events-none;
+    @apply text-zinc-400 float-left h-0 pointer-events-none font-normal select-none;
     content: attr(data-placeholder);
   }
   
   .ProseMirror p {
-    @apply leading-relaxed mb-2;
+    @apply leading-[1.75] mb-3 text-[15px] text-zinc-800;
   }
 
   .ProseMirror h1 {
-    @apply text-3xl font-bold mt-6 mb-2;
+    @apply text-2xl sm:text-3xl font-bold tracking-tight text-zinc-900 mt-7 mb-3 leading-snug;
   }
 
   .ProseMirror h2 {
-    @apply text-2xl font-bold mt-5 mb-2;
+    @apply text-xl sm:text-2xl font-bold tracking-tight text-zinc-900 mt-6 mb-2.5 leading-snug;
   }
 
   .ProseMirror h3 {
-    @apply text-xl font-bold mt-4 mb-2;
+    @apply text-lg sm:text-xl font-semibold tracking-tight text-zinc-800 mt-5 mb-2 leading-snug;
   }
 
   .ProseMirror ul {
-    @apply list-disc list-outside mb-2 ml-5;
+    @apply list-disc list-outside mb-3 ml-6 space-y-1 text-zinc-800 text-[15px];
   }
 
   .ProseMirror ol {
-    @apply list-decimal list-outside mb-2 ml-5;
+    @apply list-decimal list-outside mb-3 ml-6 space-y-1 text-zinc-800 text-[15px];
+  }
+
+  .ProseMirror li > p {
+    @apply mb-0.5;
   }
 
   .ProseMirror blockquote {
-    @apply border-l-4 border-gray-300 pl-4 italic my-2 text-gray-600;
+    @apply border-l-2 border-zinc-300 pl-4 py-1 italic my-3 text-zinc-600 bg-zinc-50/60 rounded-r-md;
   }
 
   .ProseMirror pre {
-    @apply bg-gray-100 p-4 rounded-md font-mono text-sm mb-2 overflow-x-auto;
+    @apply bg-zinc-900 text-zinc-100 p-4 rounded-xl font-mono text-[13px] leading-relaxed my-3 overflow-x-auto border border-zinc-800 shadow-xs;
+  }
+
+  .ProseMirror pre code {
+    @apply bg-transparent text-inherit p-0 border-0;
   }
 
   .ProseMirror div[data-node-view-wrapper] {
-    @apply mb-2;
+    @apply mb-3;
   }
 
   .ProseMirror code {
-    @apply bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono text-pink-600;
+    @apply bg-zinc-100 text-pink-600 px-1.5 py-0.5 rounded-md text-[13px] font-mono border border-zinc-200/70;
+  }
+
+  .ProseMirror hr {
+    @apply my-6 border-0 border-t border-zinc-200;
   }
 
   /* Task List Styles */
@@ -94,37 +126,44 @@
     list-style: none;
     padding: 0;
     margin-left: 0;
+    margin-bottom: 0.75rem;
   }
 
   .ProseMirror ul[data-type="taskList"] li {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.35rem;
   }
 
   .ProseMirror ul[data-type="taskList"] li > label {
     flex: 0 0 auto;
-    margin-right: 0.5rem;
-    margin-top: 0.35rem;
+    margin-right: 0.6rem;
+    margin-top: 0.25rem;
     user-select: none;
   }
 
   .ProseMirror ul[data-type="taskList"] li > label input[type="checkbox"] {
-    width: 1.1rem;
-    height: 1.1rem;
-    border-radius: 0.25rem;
-    border: 1px solid #ccc;
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 0.35rem;
+    border: 1.5px solid #d4d4d8;
     cursor: pointer;
     appearance: none;
     display: flex;
     align-items: center;
     justify-content: center;
     background-color: white;
+    transition: all 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ProseMirror ul[data-type="taskList"] li > label input[type="checkbox"]:hover {
+    border-color: #a1a1aa;
+    background-color: #fafafa;
   }
 
   .ProseMirror ul[data-type="taskList"] li > label input[type="checkbox"]:checked {
-    background-color: #0EA5E9;
-    border-color: #0EA5E9;
+    background-color: #2563EB;
+    border-color: #2563EB;
   }
 
   .ProseMirror ul[data-type="taskList"] li > label input[type="checkbox"]:checked::after {
@@ -134,7 +173,7 @@
     border: solid white;
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
-    margin-bottom: 0.15rem;
+    margin-bottom: 0.12rem;
   }
 
   .ProseMirror ul[data-type="taskList"] li > div {
@@ -147,36 +186,13 @@
 
   .ProseMirror ul[data-type="taskList"] li[data-checked="true"] > div > p {
     text-decoration: line-through;
-    color: #9CA3AF;
+    color: #a1a1aa;
   }
-
 }
 
 @layer utilities {
-  
-  .tab-active-curve::before,
-  .tab-active-curve::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    width: 10px;
-    height: 10px;
-    pointer-events: none;
-  }
-  .tab-active-curve::before {
-    left: -10px;
-    background: radial-gradient(circle at 0 0, transparent 10px, white 10px);
-  }
-  .tab-active-curve::after {
-    right: -10px;
-    background: radial-gradient(circle at 100% 0, transparent 10px, white 10px);
-  }
-
   .drag-region {
     /* Handled by data-tauri-drag-region attribute in Tauri */
-  }
-  .no-drag {
-    /* -webkit-app-region: no-drag; */
   }
 }
 

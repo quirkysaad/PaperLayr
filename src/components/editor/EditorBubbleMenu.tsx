@@ -97,30 +97,30 @@ export const EditorBubbleMenu = ({ editor }: EditorBubbleMenuProps) => {
     <BubbleMenu 
       editor={editor} 
       options={{ placement: 'top' }}
-      className="flex items-center gap-1 bg-white border border-gray-200 shadow-lg rounded-lg p-1.5"
+      className="flex items-center gap-0.5 bg-white/95 backdrop-blur-md border border-zinc-200/80 shadow-[0_12px_32px_rgba(0,0,0,0.12),0_0_0_1px_rgba(0,0,0,0.05)] rounded-xl p-1 z-50"
     >
       <div className="relative" ref={menuRef}>
         <button
           onClick={toggleFontSize}
-          className={`flex items-center gap-1 px-2 py-1.5 rounded-md hover:bg-gray-100 text-sm font-medium transition-colors ${
-            isFontSizeOpen ? 'bg-gray-100' : ''
+          className={`flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-zinc-100 text-xs font-semibold text-zinc-700 transition-colors cursor-pointer ${
+            isFontSizeOpen ? 'bg-zinc-100' : ''
           }`}
         >
-          <Type size={16} />
-          <span className="w-8 text-center">{currentFontSize}</span>
-          <ChevronDown size={14} className="text-gray-500" />
+          <Type size={14} />
+          <span className="w-5 text-center">{currentFontSize}</span>
+          <ChevronDown size={12} className="text-zinc-400" />
         </button>
 
         {isFontSizeOpen && (
-          <div className="absolute top-full left-0 mt-1 w-24 max-h-60 overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-lg py-1 z-50">
+          <div className="absolute top-full left-0 mt-1.5 w-24 max-h-60 overflow-y-auto bg-white/95 backdrop-blur-md border border-zinc-200/80 shadow-xl rounded-xl p-1 z-50">
             {FONT_SIZES.map((size) => (
               <button
                 key={size}
                 onClick={() => setFontSize(size)}
-                className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 flex items-center justify-between"
+                className="w-full px-2.5 py-1.5 text-left text-xs font-medium hover:bg-zinc-100 rounded-lg flex items-center justify-between text-zinc-700 transition-colors"
               >
-                <span>{size}</span>
-                {currentFontSize === size && <Check size={14} />}
+                <span>{size}px</span>
+                {currentFontSize === size && <Check size={12} className="text-blue-600" />}
               </button>
             ))}
           </div>
@@ -130,28 +130,28 @@ export const EditorBubbleMenu = ({ editor }: EditorBubbleMenuProps) => {
       <div className="relative" ref={highlightRef}>
         <button
           onClick={toggleHighlight}
-          className={`flex items-center justify-center p-1.5 rounded-md hover:bg-gray-100 transition-colors ${
-            editor.isActive('highlight') ? 'bg-gray-100 text-purple-600' : 'text-gray-700'
+          className={`flex items-center justify-center p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${
+            editor.isActive('highlight') ? 'bg-blue-50 text-blue-600' : 'text-zinc-600'
           }`}
           title="Highlight"
         >
-          <Highlighter size={16} />
+          <Highlighter size={15} />
         </button>
 
         {isHighlightOpen && (
-          <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 shadow-xl rounded-lg p-2 z-50 flex flex-col gap-2">
-            <div className="flex gap-1 flex-wrap">
+          <div className="absolute top-full left-0 mt-1.5 w-48 bg-white/95 backdrop-blur-md border border-zinc-200/80 shadow-xl rounded-xl p-2 z-50 flex flex-col gap-2">
+            <div className="flex gap-1.5 flex-wrap">
               {HIGHLIGHT_COLORS.map(({ label, color }) => (
                 <button
                   key={color}
                   onClick={() => setHighlight(color)}
-                  className="w-6 h-6 rounded-full border border-gray-200 flex-shrink-0"
+                  className="w-6 h-6 rounded-full border border-zinc-200 flex-shrink-0 cursor-pointer shadow-2xs hover:scale-105 transition-transform"
                   style={{ backgroundColor: color }}
                   title={label}
                 />
               ))}
-              <div className="relative w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 flex-shrink-0 overflow-hidden" title="Custom color">
-                <Palette size={14} className="pointer-events-none" />
+              <div className="relative w-6 h-6 rounded-full border border-zinc-200 flex items-center justify-center text-zinc-500 hover:bg-zinc-100 flex-shrink-0 overflow-hidden cursor-pointer" title="Custom color">
+                <Palette size={13} className="pointer-events-none" />
                 <input
                   type="color"
                   className="absolute inset-0 w-8 h-8 -ml-1 -mt-1 opacity-0 cursor-pointer"
@@ -163,10 +163,10 @@ export const EditorBubbleMenu = ({ editor }: EditorBubbleMenuProps) => {
                   editor.chain().focus().unsetHighlight().run()
                   setIsHighlightOpen(false)
                 }}
-                className="w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 flex-shrink-0"
+                className="w-6 h-6 rounded-full border border-zinc-200 flex items-center justify-center text-zinc-500 hover:bg-zinc-100 flex-shrink-0 cursor-pointer"
                 title="Remove Highlight"
               >
-                <Eraser size={14} />
+                <Eraser size={13} />
               </button>
             </div>
           </div>
@@ -176,28 +176,28 @@ export const EditorBubbleMenu = ({ editor }: EditorBubbleMenuProps) => {
       <div className="relative" ref={textColorRef}>
         <button
           onClick={toggleTextColor}
-          className={`flex items-center justify-center p-1.5 rounded-md hover:bg-gray-100 transition-colors ${
-            editor.getAttributes('textStyle').color ? 'bg-gray-100 text-purple-600' : 'text-gray-700'
+          className={`flex items-center justify-center p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${
+            editor.getAttributes('textStyle').color ? 'bg-blue-50 text-blue-600' : 'text-zinc-600'
           }`}
           title="Text Color"
         >
-          <Baseline size={16} />
+          <Baseline size={15} />
         </button>
 
         {isTextColorOpen && (
-          <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 shadow-xl rounded-lg p-2 z-50 flex flex-col gap-2">
-            <div className="flex gap-1 flex-wrap">
+          <div className="absolute top-full left-0 mt-1.5 w-48 bg-white/95 backdrop-blur-md border border-zinc-200/80 shadow-xl rounded-xl p-2 z-50 flex flex-col gap-2">
+            <div className="flex gap-1.5 flex-wrap">
               {TEXT_COLORS.map(({ label, color }) => (
                 <button
                   key={color}
                   onClick={() => setTextColor(color)}
-                  className="w-6 h-6 rounded-full border border-gray-200 flex-shrink-0"
+                  className="w-6 h-6 rounded-full border border-zinc-200 flex-shrink-0 cursor-pointer shadow-2xs hover:scale-105 transition-transform"
                   style={{ backgroundColor: color }}
                   title={label}
                 />
               ))}
-              <div className="relative w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 flex-shrink-0 overflow-hidden" title="Custom color">
-                <Palette size={14} className="pointer-events-none" />
+              <div className="relative w-6 h-6 rounded-full border border-zinc-200 flex items-center justify-center text-zinc-500 hover:bg-zinc-100 flex-shrink-0 overflow-hidden cursor-pointer" title="Custom color">
+                <Palette size={13} className="pointer-events-none" />
                 <input
                   type="color"
                   className="absolute inset-0 w-8 h-8 -ml-1 -mt-1 opacity-0 cursor-pointer"
@@ -209,66 +209,66 @@ export const EditorBubbleMenu = ({ editor }: EditorBubbleMenuProps) => {
                   editor.chain().focus().unsetColor().run()
                   setIsTextColorOpen(false)
                 }}
-                className="w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 flex-shrink-0"
+                className="w-6 h-6 rounded-full border border-zinc-200 flex items-center justify-center text-zinc-500 hover:bg-zinc-100 flex-shrink-0 cursor-pointer"
                 title="Reset Color"
               >
-                <Eraser size={14} />
+                <Eraser size={13} />
               </button>
             </div>
           </div>
         )}
       </div>
 
-      <div className="w-px h-6 bg-gray-200 mx-1" />
+      <div className="w-px h-5 bg-zinc-200 mx-1" />
 
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
-        className={`p-1.5 rounded-md hover:bg-gray-100 transition-colors ${
-          editor.isActive('bold') ? 'bg-gray-100 text-purple-600' : 'text-gray-700'
+        className={`p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${
+          editor.isActive('bold') ? 'bg-zinc-900 text-white hover:bg-black hover:text-white' : 'text-zinc-600'
         }`}
         title="Bold"
       >
-        <Bold size={16} />
+        <Bold size={15} />
       </button>
 
       <button
         onClick={() => editor.chain().focus().toggleItalic().run()}
-        className={`p-1.5 rounded-md hover:bg-gray-100 transition-colors ${
-          editor.isActive('italic') ? 'bg-gray-100 text-purple-600' : 'text-gray-700'
+        className={`p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${
+          editor.isActive('italic') ? 'bg-zinc-900 text-white hover:bg-black hover:text-white' : 'text-zinc-600'
         }`}
         title="Italic"
       >
-        <Italic size={16} />
+        <Italic size={15} />
       </button>
 
       <button
         onClick={() => editor.chain().focus().toggleUnderline().run()}
-        className={`p-1.5 rounded-md hover:bg-gray-100 transition-colors ${
-          editor.isActive('underline') ? 'bg-gray-100 text-purple-600' : 'text-gray-700'
+        className={`p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${
+          editor.isActive('underline') ? 'bg-zinc-900 text-white hover:bg-black hover:text-white' : 'text-zinc-600'
         }`}
         title="Underline"
       >
-        <UnderlineIcon size={16} />
+        <UnderlineIcon size={15} />
       </button>
 
       <button
         onClick={() => editor.chain().focus().toggleStrike().run()}
-        className={`p-1.5 rounded-md hover:bg-gray-100 transition-colors ${
-          editor.isActive('strike') ? 'bg-gray-100 text-purple-600' : 'text-gray-700'
+        className={`p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${
+          editor.isActive('strike') ? 'bg-zinc-900 text-white hover:bg-black hover:text-white' : 'text-zinc-600'
         }`}
         title="Strikethrough"
       >
-        <Strikethrough size={16} />
+        <Strikethrough size={15} />
       </button>
       
       <button
         onClick={() => editor.chain().focus().toggleCode().run()}
-        className={`p-1.5 rounded-md hover:bg-gray-100 transition-colors ${
-          editor.isActive('code') ? 'bg-gray-100 text-purple-600' : 'text-gray-700'
+        className={`p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${
+          editor.isActive('code') ? 'bg-zinc-900 text-white hover:bg-black hover:text-white' : 'text-zinc-600'
         }`}
         title="Code"
       >
-        <Code size={16} />
+        <Code size={15} />
       </button>
     </BubbleMenu>
   )

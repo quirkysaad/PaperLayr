@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useStore } from '../store';
-import { X } from 'lucide-react';
+import { X, Check } from 'lucide-react';
 
 const ACCENT_COLORS = [
   '#ef4444', // red
@@ -9,8 +9,8 @@ const ACCENT_COLORS = [
   '#10b981', // emerald
   '#0ea5e9', // sky
   '#6366f1', // indigo
-  '#d946ef', // fuchsia
-  '#db2777', // pink
+  '#8b5cf6', // violet
+  '#ec4899', // pink
 ];
 
 export const LayerModal = () => {
@@ -54,24 +54,29 @@ export const LayerModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[100] backdrop-blur-sm">
+    <div
+      className="fixed inset-0 bg-black/35 flex items-center justify-center z-[100] backdrop-blur-xs select-none"
+      onClick={closeLayerModal}
+    >
       <div 
-        className="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden border border-gray-100"
+        className="bg-white rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.25),0_0_0_1px_rgba(0,0,0,0.06)] w-full max-w-md mx-4 overflow-hidden border border-zinc-100"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between p-4 border-b border-gray-100">
-          <h2 className="text-lg font-semibold text-gray-900">{isEdit ? 'Edit Layer' : 'Create New Layer'}</h2>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-100">
+          <h2 className="text-[16px] font-bold text-zinc-900 tracking-tight">
+            {isEdit ? 'Edit Layer' : 'Create New Layer'}
+          </h2>
           <button 
             onClick={closeLayerModal}
-            className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-1 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-lg transition-colors cursor-pointer"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
         
         <form onSubmit={handleSubmit} className="p-6">
           <div className="mb-6">
-            <label htmlFor="layerName" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="layerName" className="block text-[13px] font-semibold text-zinc-700 mb-2">
               Layer Name
             </label>
             <input
@@ -80,45 +85,50 @@ export const LayerModal = () => {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow"
-              placeholder="e.g. Personal, Work, Project X"
+              className="w-full px-3.5 py-2.5 bg-zinc-50/50 border border-zinc-200 rounded-xl text-zinc-900 text-[14px] outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 transition-all font-medium"
+              placeholder="e.g. Personal, Work, Projects"
               autoFocus
             />
           </div>
 
           <div className="mb-8">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-[13px] font-semibold text-zinc-700 mb-2.5">
               Accent Color
             </label>
-            <div className="flex flex-wrap gap-3">
-              {ACCENT_COLORS.map(color => (
-                <button
-                  key={color}
-                  type="button"
-                  onClick={() => setSelectedColor(color)}
-                  className={`w-8 h-8 rounded-full transition-transform ${selectedColor === color ? 'ring-2 ring-offset-2 scale-110' : 'hover:scale-110'}`}
-                  style={{ 
-                    backgroundColor: color,
-                    boxShadow: selectedColor === color ? `0 0 0 2px ${color}80` : 'none'
-                  }}
-                  aria-label={`Select color ${color}`}
-                />
-              ))}
+            <div className="flex flex-wrap gap-2.5">
+              {ACCENT_COLORS.map(color => {
+                const isSelected = selectedColor === color;
+
+                return (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() => setSelectedColor(color)}
+                    className={`w-8 h-8 rounded-full transition-all flex items-center justify-center cursor-pointer shadow-2xs ${
+                      isSelected ? 'scale-110 ring-2 ring-offset-2 ring-zinc-800' : 'hover:scale-105 opacity-80 hover:opacity-100'
+                    }`}
+                    style={{ backgroundColor: color }}
+                    aria-label={`Select color ${color}`}
+                  >
+                    {isSelected && <Check size={14} className="text-white drop-shadow-xs" strokeWidth={2.5} />}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-2.5">
             <button
               type="button"
               onClick={closeLayerModal}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+              className="px-4 py-2 text-[13px] font-medium text-zinc-600 bg-zinc-100 hover:bg-zinc-200 rounded-xl transition-colors cursor-pointer"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!name.trim()}
-              className="px-4 py-2 text-sm font-medium text-white bg-gray-900 border border-transparent rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-[13px] font-semibold text-white bg-zinc-900 hover:bg-black rounded-xl transition-colors cursor-pointer shadow-xs disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isEdit ? 'Save Changes' : 'Create Layer'}
             </button>

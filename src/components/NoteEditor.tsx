@@ -13,7 +13,7 @@ import { CustomImage } from "./editor/CustomImage";
 import { useStore } from "../store";
 import { useShallow } from "zustand/react/shallow";
 import { useEffect, useState, useRef, useMemo } from "react";
-import { Home, ChevronRight, ChevronsRight, FileText, Pin } from "lucide-react";
+import { ChevronRight, FileText, Pin } from "lucide-react";
 import { emit } from "@tauri-apps/api/event";
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -32,8 +32,6 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
     notes,
     layers,
     updateNote,
-    isSidebarOpen,
-    toggleSidebar,
     setSelectedLayer,
     setSelectedNote,
     openInCurrentTab,
@@ -41,8 +39,6 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
     notes: state.notes,
     layers: state.layers,
     updateNote: state.updateNote,
-    isSidebarOpen: state.isSidebarOpen,
-    toggleSidebar: state.toggleSidebar,
     setSelectedLayer: state.setSelectedLayer,
     setSelectedNote: state.setSelectedNote,
     openInCurrentTab: state.openInCurrentTab,
@@ -50,9 +46,9 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
   const note = notes[noteId];
   const layer = note
     ? layers[note.layerId] ||
-      (note.layerId === "stickies"
-        ? { id: "stickies", name: "Stickies" }
-        : null)
+    (note.layerId === "stickies"
+      ? { id: "stickies", name: "Stickies" }
+      : null)
     : null;
   const [title, setTitle] = useState(note?.title || "");
   const [pasteModalData, setPasteModalData] = useState<{
@@ -196,7 +192,7 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
     if (editor && note && editor.getHTML() !== note.content) {
       editor.commands.setContent(note.content || "");
     }
-  }, [noteId, editor, note?.content]); 
+  }, [noteId, editor, note?.content]);
 
   useEffect(() => {
     if (note && title !== note.title) {
@@ -222,19 +218,10 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-white">
       {/* Breadcrumbs Header */}
-      <div className="flex-shrink-0 h-12 flex items-center justify-between px-6 bg-white border-b border-transparent">
-        <div className="flex items-center gap-1.5 text-[14px] text-gray-500 font-medium">
-          {!isSidebarOpen && (
-            <button
-              onClick={toggleSidebar}
-              className="mr-2 p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
-              title="Open sidebar (Cmd+.)"
-            >
-              <ChevronsRight size={16} />
-            </button>
-          )}
+      <div className="flex-shrink-0 h-11 flex items-center justify-between px-1 bg-white border-b border-zinc-100 select-none">
+        <div className="flex items-center gap-1.5 text-[13px] text-zinc-500 font-medium">
           <div
-            className="flex items-center gap-1.5 cursor-pointer hover:bg-gray-50 px-1 py-0.5 rounded transition-colors"
+            className="flex items-center gap-1.5 cursor-pointer hover:bg-zinc-100/70 px-2 py-1 rounded-md transition-colors"
             onClick={() => {
               if (layer) {
                 setSelectedLayer(layer.id);
@@ -242,35 +229,44 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
               }
             }}
           >
-            <div className="w-5 h-5 bg-purple-100 rounded text-purple-600 flex items-center justify-center">
-              <Home size={12} strokeWidth={2.5} />
+            <div
+              className="w-4 h-4 rounded-full flex items-center justify-center"
+              style={{
+                backgroundColor: layer?.accentColor ? `${layer.accentColor}25` : '#f4f4f5',
+              }}
+            >
+              <span
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: layer?.accentColor || '#71717a' }}
+              />
             </div>
-            <span className="text-gray-700">{layer?.name || "Workspace"}</span>
+            <span className="text-zinc-700 font-medium">{layer?.name || "Workspace"}</span>
           </div>
 
           {note.parentId && notes[note.parentId] && (
             <>
-              <ChevronRight size={14} className="text-gray-400 mx-0.5" />
+              <ChevronRight size={13} className="text-zinc-300 mx-0.5" />
               <div
-                className="flex items-center gap-1.5 cursor-pointer hover:bg-gray-50 px-1 py-0.5 rounded transition-colors"
+                className="flex items-center gap-1.5 cursor-pointer hover:bg-zinc-100/70 px-2 py-1 rounded-md transition-colors"
                 onClick={() => {
                   setSelectedNote(note.parentId!);
                   openInCurrentTab(note.parentId!);
                 }}
               >
-                <FileText size={14} className="text-gray-400" />
-                <span className="text-gray-700 truncate max-w-[150px]">
+                <FileText size={13} className="text-zinc-400" />
+                <span className="text-zinc-700 truncate max-w-[160px]">
                   {notes[note.parentId].title || "Untitled"}
                 </span>
               </div>
             </>
           )}
 
-          <ChevronRight size={14} className="text-gray-400 mx-0.5" />
-          <div className="px-1 py-0.5 text-gray-800 font-semibold truncate max-w-[200px]">
+          <ChevronRight size={13} className="text-zinc-300 mx-0.5" />
+          <div className="px-2 py-1 text-zinc-900 font-semibold truncate max-w-[220px]">
             {note.title || "Untitled"}
           </div>
         </div>
+
         <div className="flex items-center">
           <button
             onClick={async () => {
@@ -301,10 +297,10 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
                 console.error("Error creating widget window:", e);
               });
             }}
-            className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded transition-colors"
-            title="Pin to Desktop"
+            className="flex items-center gap-1.5 px-2.5 py-1 text-[12px] font-medium text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 rounded-lg transition-colors cursor-pointer"
+            title="Pin note to desktop as widget"
           >
-            <Pin size={16} />
+            <Pin size={13} />
           </button>
         </div>
       </div>
@@ -313,17 +309,17 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
         ref={scrollRef}
         className="flex-1 overflow-y-auto flex flex-col items-center"
       >
-        <div className="w-full px-8 pt-8 pb-12 flex flex-col relative min-h-full">
+        <div className="w-full max-w-3xl px-8 pt-10 pb-20 flex flex-col relative min-h-full">
           {/* Title */}
           <input
-            className="text-4xl font-bold font-sans text-gray-900 border-none outline-none bg-transparent mb-6 w-full placeholder-gray-300"
+            className="text-3xl sm:text-4xl font-bold font-sans text-zinc-900 border-none outline-none bg-transparent mb-6 w-full placeholder-zinc-300 tracking-tight"
             placeholder="Untitled"
             value={title}
             onChange={handleTitleChange}
           />
 
           {/* Editor */}
-          <div className="flex-1 w-full text-gray-900 text-base">
+          <div className="flex-1 w-full text-zinc-900 text-base">
             {editor && <EditorBubbleMenu editor={editor} />}
             <EditorContent editor={editor} className="min-h-full" />
           </div>
@@ -337,17 +333,17 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
             className="fixed inset-0"
             onClick={handleKeepOriginal}
           />
-          <div className="bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] w-[440px] p-6 relative z-10 border border-gray-100 font-sans">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+          <div className="bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.05)] w-[420px] p-6 relative z-10 border border-zinc-100 font-sans">
+            <h3 className="text-lg font-bold text-zinc-900 mb-2 tracking-tight">
               Pasted Content Formatting
             </h3>
-            <p className="text-[14.5px] text-gray-600 leading-relaxed mb-6">
+            <p className="text-[14px] text-zinc-600 leading-relaxed mb-6">
               Multiple line breaks (
-              <code className="px-1 py-0.5 bg-gray-100 rounded text-pink-600 text-xs font-mono">
+              <code className="px-1 py-0.5 bg-zinc-100 rounded text-pink-600 text-xs font-mono">
                 &lt;br /&gt;
               </code>
               ) or extra spaces (
-              <code className="px-1 py-0.5 bg-gray-100 rounded text-pink-600 text-xs font-mono">
+              <code className="px-1 py-0.5 bg-zinc-100 rounded text-pink-600 text-xs font-mono">
                 &amp;nbsp;
               </code>
               ) were detected in the pasted content. Would you like to strip extra spaces?
@@ -355,13 +351,13 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
             <div className="flex justify-end gap-2.5">
               <button
                 onClick={handleKeepOriginal}
-                className="px-4 py-2 text-[14px] font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
+                className="px-3.5 py-2 text-[13px] font-medium text-zinc-700 bg-zinc-100 hover:bg-zinc-200 rounded-xl transition-colors cursor-pointer"
               >
                 Keep Original Spaces
               </button>
               <button
                 onClick={handleStripSpaces}
-                className="px-4 py-2 text-[14px] font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer"
+                className="px-4 py-2 text-[13px] font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors cursor-pointer shadow-xs"
               >
                 Strip Extra Spaces
               </button>

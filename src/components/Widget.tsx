@@ -156,7 +156,7 @@ export const Widget = ({
   if (noteId && !note) {
     return (
       <div
-        className="w-full h-full bg-white border border-gray-200/50 p-4 flex items-center justify-center text-gray-500 text-sm shadow-xl"
+        className="w-full h-full bg-white border border-zinc-200/80 p-4 flex items-center justify-center text-zinc-500 text-sm rounded-2xl"
         data-tauri-drag-region
       >
         Note not found or deleted.
@@ -171,25 +171,25 @@ export const Widget = ({
   }
 
   return (
-    <div className="w-screen h-screen p-4 bg-transparent box-border flex flex-col">
-      <div className="flex-1 w-full bg-white shadow-md rounded-xl border border-gray-200/50 flex flex-col overflow-hidden transition-all duration-200">
+    <div className="w-screen h-screen p-3 bg-transparent box-border flex flex-col select-none">
+      <div className="flex-1 w-full bg-white rounded-2xl border border-zinc-200/80 flex flex-col overflow-hidden transition-all duration-200">
         {/* Widget Header (Drag region) */}
         <div
           data-tauri-drag-region
-          className="flex-shrink-0 flex items-center justify-between px-3 py-2 border-b border-gray-200/50 bg-gray-50 z-10 rounded-t-xl"
+          className="flex-shrink-0 h-10 flex items-center justify-between px-3.5 border-b border-zinc-100 bg-zinc-50/80 z-10 rounded-t-2xl"
         >
           <div
             data-tauri-drag-region
-            className="flex items-center gap-2 text-gray-400 cursor-grab active:cursor-grabbing w-full"
+            className="flex items-center gap-2 text-zinc-400 cursor-grab active:cursor-grabbing w-full"
           >
-            <GripHorizontal size={14} className="pointer-events-none" />
-            <span className="text-xs font-medium text-gray-600 truncate pointer-events-none">
+            <GripHorizontal size={14} className="pointer-events-none text-zinc-400" />
+            <span className="text-xs font-semibold text-zinc-700 truncate pointer-events-none tracking-tight">
               {title || (isSticky ? "Sticky" : "Untitled")}
             </span>
           </div>
           <button
             onClick={() => getCurrentWindow().close()}
-            className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-1 rounded transition-colors ml-2"
+            className="text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200/60 p-1 rounded-md transition-colors ml-2 cursor-pointer"
           >
             <X size={14} />
           </button>
@@ -198,10 +198,10 @@ export const Widget = ({
         {/* Widget Content */}
         <div
           ref={scrollRef}
-          className="flex-1 overflow-y-auto p-4 custom-scrollbar"
+          className="flex-1 overflow-y-auto p-5 custom-scrollbar"
         >
           <input
-            className="text-2xl font-bold font-sans text-gray-900 border-none outline-none bg-transparent mb-4 w-full placeholder-gray-300"
+            className="text-xl sm:text-2xl font-bold font-sans text-zinc-900 border-none outline-none bg-transparent mb-3 w-full placeholder-zinc-300 tracking-tight"
             placeholder={isSticky ? "Sticky" : "Untitled"}
             value={title}
             onChange={handleTitleChange}
@@ -211,7 +211,7 @@ export const Widget = ({
 
         {/* Save Sticky Button */}
         {isSticky && (
-          <div className="flex-shrink-0 p-3 border-t border-gray-200/50 bg-gray-50 flex justify-end rounded-b-xl">
+          <div className="flex-shrink-0 p-3 border-t border-zinc-100 bg-zinc-50/50 flex justify-end rounded-b-2xl">
             <button
               onClick={async () => {
                 if (!noteId) {
@@ -222,7 +222,7 @@ export const Widget = ({
                 }
                 await getCurrentWindow().close();
               }}
-              className="px-4 py-1.5 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors"
+              className="px-4 py-2 bg-zinc-900 hover:bg-black text-white text-xs font-semibold rounded-xl transition-all shadow-xs cursor-pointer"
             >
               Save Sticky
             </button>
@@ -234,34 +234,25 @@ export const Widget = ({
       {pasteModalData && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-xs">
           <div className="fixed inset-0" onClick={handleKeepOriginal} />
-          <div className="bg-white rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] w-[400px] p-6 relative z-10 border border-gray-100 font-sans">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
-              Pasted Content Formatting
+          <div className="bg-white rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15),0_0_0_1px_rgba(0,0,0,0.05)] w-[360px] p-5 relative z-10 border border-zinc-100 font-sans">
+            <h3 className="text-base font-bold text-zinc-900 mb-2 tracking-tight">
+              Formatting Options
             </h3>
-            <p className="text-[14px] text-gray-600 leading-relaxed mb-6">
-              Multiple line breaks (
-              <code className="px-1 py-0.5 bg-gray-100 rounded text-pink-600 text-xs font-mono">
-                &lt;br /&gt;
-              </code>
-              ) or extra spaces (
-              <code className="px-1 py-0.5 bg-gray-100 rounded text-pink-600 text-xs font-mono">
-                &amp;nbsp;
-              </code>
-              ) were detected in the pasted content. Would you like to strip
-              extra spaces?
+            <p className="text-[13px] text-zinc-600 leading-relaxed mb-5">
+              Extra line breaks or spacing were detected in your pasted text. Would you like to strip them?
             </p>
-            <div className="flex justify-end gap-2.5">
+            <div className="flex justify-end gap-2">
               <button
                 onClick={handleKeepOriginal}
-                className="px-3.5 py-1.5 text-[13px] font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
+                className="px-3 py-1.5 text-[12px] font-medium text-zinc-700 bg-zinc-100 hover:bg-zinc-200 rounded-lg transition-colors cursor-pointer"
               >
-                Keep Original
+                Keep
               </button>
               <button
                 onClick={handleStripSpaces}
-                className="px-3.5 py-1.5 text-[13px] font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer"
+                className="px-3 py-1.5 text-[12px] font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors cursor-pointer shadow-xs"
               >
-                Strip Extra Spaces
+                Strip
               </button>
             </div>
           </div>

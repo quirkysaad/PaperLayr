@@ -1,34 +1,22 @@
 import { useStore } from '../store';
 import { useShallow } from 'zustand/react/shallow';
-import { Plus, Star, ChevronsRight, FileText } from 'lucide-react';
+import { Plus, Star, FileText, Clock } from 'lucide-react';
 
-const PASTEL_COLORS = [
-  'bg-rose-50 border-rose-200 hover:bg-rose-100 text-rose-900',
-  'bg-amber-50 border-amber-200 hover:bg-amber-100 text-amber-900',
-  'bg-green-50 border-green-200 hover:bg-green-100 text-green-900',
-  'bg-blue-50 border-blue-200 hover:bg-blue-100 text-blue-900',
-  'bg-indigo-50 border-indigo-200 hover:bg-indigo-100 text-indigo-900',
-  'bg-purple-50 border-purple-200 hover:bg-purple-100 text-purple-900',
-  'bg-pink-50 border-pink-200 hover:bg-pink-100 text-pink-900',
-  'bg-teal-50 border-teal-200 hover:bg-teal-100 text-teal-900',
-  'bg-orange-50 border-orange-200 hover:bg-orange-100 text-orange-900',
-];
-
-const getNoteColorClasses = (id: string) => {
-  const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return PASTEL_COLORS[hash % PASTEL_COLORS.length];
-};
+function getExcerpt(html?: string): string {
+  if (!html) return '';
+  const div = document.createElement('div');
+  div.innerHTML = html;
+  return (div.textContent || div.innerText || '').trim();
+}
 
 export const LayerView = ({ layerId }: { layerId: string }) => {
-  const { layers, notes, openInCurrentTab, createNote, isSidebarOpen, toggleSidebar } = useStore(useShallow((state) => ({
+  const { layers, notes, openInCurrentTab, createNote } = useStore(useShallow((state) => ({
     layers: state.layers,
     notes: state.notes,
     openInCurrentTab: state.openInCurrentTab,
     createNote: state.createNote,
-    isSidebarOpen: state.isSidebarOpen,
-    toggleSidebar: state.toggleSidebar,
   })));
-  const layer = layers[layerId] || (layerId === 'stickies' ? { id: 'stickies', name: 'Stickies', accentColor: '#gray' } : null);
+  const layer = layers[layerId] || (layerId === 'stickies' ? { id: 'stickies', name: 'Stickies', accentColor: '#71717a' } : null);
 
   if (!layer) return null;
 
@@ -36,70 +24,86 @@ export const LayerView = ({ layerId }: { layerId: string }) => {
   const layerNotes = Object.values(notes).filter(n => n.layerId === layerId && !n.parentId);
 
   return (
-    <div className="flex-1 overflow-y-auto bg-white flex flex-col pt-8">
-      {!isSidebarOpen && (
-        <div className="absolute top-4 left-4 z-10">
-          <button
-            onClick={toggleSidebar}
-            className="p-1.5 text-gray-400 hover:text-gray-700 bg-white hover:bg-gray-100 rounded-md transition-colors shadow-sm border border-gray-100"
-            title="Open sidebar (Cmd+.)"
-          >
-            <ChevronsRight size={18} />
-          </button>
-        </div>
-      )}
+    <div className="flex-1 overflow-y-auto bg-white flex flex-col pt-6 select-none">
 
-      <div className="px-12 py-8 flex-1 max-w-5xl">
-        <h1 className="text-4xl font-bold text-gray-900 mb-12 tracking-tight">{layer.name}</h1>
+      <div className="px-10 py-6 flex-1 max-w-6xl w-full mx-auto">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between pb-8 mb-8 border-b border-zinc-100 gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-1.5">
+              <span
+                className="w-3.5 h-3.5 rounded-full shadow-xs ring-2 ring-white"
+                style={{ backgroundColor: layer.accentColor || '#71717a' }}
+              />
+              <h1 className="text-3xl sm:text-4xl font-bold text-zinc-900 tracking-tight">
+                {layer.name}
+              </h1>
+            </div>
+            <p className="text-zinc-500 text-[13px] font-medium pl-6.5">
+              {layerNotes.length} {layerNotes.length === 1 ? 'document' : 'documents'}
+            </p>
+          </div>
 
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-gray-700">Documents</h2>
           <button
             onClick={() => createNote(layer.id)}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium text-[14px] rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-zinc-900 hover:bg-black text-white text-[13px] font-semibold rounded-xl transition-all shadow-xs self-start sm:self-auto cursor-pointer"
           >
-            <Plus size={16} /> New Document
+            <Plus size={15} strokeWidth={2.2} /> New Document
           </button>
         </div>
 
         {layerNotes.length === 0 ? (
-          <div className="py-12 text-center text-gray-500 border-2 border-dashed border-gray-100 rounded-xl">
-            <p className="mb-2 text-[15px]">No documents in this layer yet.</p>
+          <div className="py-16 text-center border-2 border-dashed border-zinc-200/80 rounded-2xl bg-zinc-50/40 max-w-md mx-auto my-8 p-8">
+            <div className="w-12 h-12 rounded-2xl bg-white border border-zinc-200/80 flex items-center justify-center mx-auto mb-4 text-zinc-400 shadow-xs">
+              <FileText size={22} strokeWidth={1.5} />
+            </div>
+            <h3 className="text-base font-semibold text-zinc-800 mb-1">No documents yet</h3>
+            <p className="text-[13px] text-zinc-500 mb-5 leading-relaxed">
+              Start writing ideas, thoughts, or plans in {layer.name}.
+            </p>
             <button
               onClick={() => createNote(layer.id)}
-              className="text-blue-500 font-medium hover:underline text-[15px]"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-zinc-900 hover:bg-black text-white text-[13px] font-semibold rounded-xl transition-all shadow-xs cursor-pointer"
             >
-              Create one
+              <Plus size={14} /> Create Document
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {layerNotes.map(note => {
-              const colorClasses = getNoteColorClasses(note.id);
-              
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+            {layerNotes.map((note) => {
+              const excerpt = getExcerpt(note.content);
+
               return (
                 <div
                   key={note.id}
                   onClick={() => openInCurrentTab(note.id)}
-                  className={`group rounded-xl p-4 border transition-all cursor-pointer flex flex-col h-[140px] relative ${colorClasses} hover:shadow-md`}
+                  className="group bg-white hover:bg-zinc-50/60 border border-zinc-200/80 hover:border-zinc-300 rounded-2xl p-4.5 transition-all duration-150 cursor-pointer flex flex-col h-[155px] relative shadow-[0_1px_2px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_16px_-4px_rgba(0,0,0,0.06)]"
                 >
-                  {note.isFavorite && (
-                    <div className="absolute top-4 right-4 text-yellow-500">
-                      <Star size={14} className="fill-yellow-500" />
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <div className="flex items-center gap-2 flex-1 min-w-0">
+                      <FileText size={15} className="shrink-0 text-zinc-400 group-hover:text-blue-600 transition-colors" />
+                      <span className="text-[14.5px] font-semibold text-zinc-900 truncate tracking-tight group-hover:text-blue-600 transition-colors">
+                        {note.title || 'Untitled'}
+                      </span>
                     </div>
-                  )}
-                  
-                  <div className="flex items-start gap-2.5">
-                    <FileText size={16} className="shrink-0 mt-0.5 opacity-60" />
-                    <div className="text-[15px] font-medium leading-snug line-clamp-2 pr-6">
-                      {note.title || 'Untitled'}
-                    </div>
+
+                    {note.isFavorite && (
+                      <Star size={14} className="fill-amber-400 text-amber-400 shrink-0 mt-0.5" />
+                    )}
                   </div>
 
-                  <div className="mt-auto">
-                    <div className="text-[13px] font-medium opacity-60">
-                      Last updated: {new Date(note.updatedAt).toLocaleDateString('en-US')}
-                    </div>
+                  <p className="text-[13px] text-zinc-500 line-clamp-2 leading-relaxed mb-auto">
+                    {excerpt || 'Empty note...'}
+                  </p>
+
+                  <div className="pt-3 border-t border-zinc-100 flex items-center gap-1.5 text-[11.5px] text-zinc-400 font-medium">
+                    <Clock size={12} className="text-zinc-300" />
+                    <span>
+                      {new Date(note.updatedAt).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </span>
                   </div>
                 </div>
               );

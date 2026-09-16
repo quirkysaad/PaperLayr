@@ -12,13 +12,9 @@ import { UpdateModal } from "./components/UpdateModal";
 import { Widget } from "./components/Widget";
 import { useStore } from "./store";
 import { useUpdater } from "./hooks/useUpdater";
-import { useShallow } from "zustand/react/shallow";
 
 function App() {
-  const { layers, isSidebarOpen } = useStore(useShallow((state) => ({
-    layers: state.layers,
-    isSidebarOpen: state.isSidebarOpen,
-  })));
+  const layers = useStore((state) => state.layers);
   const urlParams = new URLSearchParams(window.location.search);
   const widgetId = urlParams.get("widget");
   const isStickyMode = urlParams.get("sticky") === "true";
@@ -92,12 +88,6 @@ function App() {
       if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === "n") {
         e.preventDefault();
         useStore.getState().openLayerModal("create");
-      }
-
-      // Cmd/Ctrl + . -> Toggle Sidebar
-      if ((e.metaKey || e.ctrlKey) && e.key === ".") {
-        e.preventDefault();
-        useStore.getState().toggleSidebar();
       }
     };
 
@@ -180,7 +170,7 @@ function App() {
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-white text-gray-900 font-sans">
-      {isSidebarOpen && <Sidebar />}
+      <Sidebar />
       <MainContent />
       <Search />
       <ConfirmModal />

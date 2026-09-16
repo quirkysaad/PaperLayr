@@ -40,15 +40,15 @@ export const UpdateModal = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/25 backdrop-blur-[1px] select-none">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/35 backdrop-blur-xs select-none">
       <div className="fixed inset-0" onClick={handleClose} />
 
-      <div className="bg-white rounded-2xl shadow-[0_12px_40px_rgb(0,0,0,0.14)] border border-gray-100 w-[420px] max-w-[90vw] p-6 relative z-10 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.25),0_0_0_1px_rgba(0,0,0,0.06)] border border-zinc-100 w-[420px] max-w-[90vw] p-6 relative z-10 overflow-hidden mx-4">
         {/* Close Button */}
         {status !== 'downloading' && (
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="absolute top-4 right-4 p-1 rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 transition-colors cursor-pointer"
           >
             <X size={18} />
           </button>
@@ -183,11 +183,11 @@ export const UpdateModal = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-2 pt-2 border-t border-gray-100">
+        <div className="flex items-center justify-end gap-2 pt-3 border-t border-zinc-100">
           {status === 'checking' && (
             <button
               onClick={handleClose}
-              className="px-4 py-2 text-[13px] font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              className="px-4 py-2 text-[13px] font-medium text-zinc-600 hover:bg-zinc-100 rounded-xl transition-colors cursor-pointer"
             >
               Cancel
             </button>
@@ -196,7 +196,7 @@ export const UpdateModal = () => {
           {status === 'up-to-date' && (
             <button
               onClick={handleClose}
-              className="px-4 py-2 text-[13px] font-semibold text-white bg-gray-900 hover:bg-black rounded-lg transition-colors"
+              className="px-4 py-2 text-[13px] font-semibold text-white bg-zinc-900 hover:bg-black rounded-xl transition-colors cursor-pointer"
             >
               Done
             </button>
@@ -206,15 +206,15 @@ export const UpdateModal = () => {
             <>
               <button
                 onClick={handleClose}
-                className="px-4 py-2 text-[13px] font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="px-4 py-2 text-[13px] font-medium text-zinc-600 hover:bg-zinc-100 rounded-xl transition-colors cursor-pointer"
               >
                 Later
               </button>
               <button
                 onClick={() => downloadAndInstall()}
-                className="px-4 py-2 text-[13px] font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
+                className="px-4 py-2 text-[13px] font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
               >
-                <ArrowUpCircle size={16} />
+                <ArrowUpCircle size={15} />
                 Update Now
               </button>
             </>
@@ -223,7 +223,7 @@ export const UpdateModal = () => {
           {status === 'downloading' && (
             <button
               disabled
-              className="px-4 py-2 text-[13px] font-medium text-gray-400 bg-gray-100 rounded-lg cursor-not-allowed flex items-center gap-2"
+              className="px-4 py-2 text-[13px] font-medium text-zinc-400 bg-zinc-100 rounded-xl cursor-not-allowed flex items-center gap-2"
             >
               <Loader2 size={14} className="animate-spin" />
               Downloading...
@@ -234,15 +234,15 @@ export const UpdateModal = () => {
             <>
               <button
                 onClick={handleClose}
-                className="px-4 py-2 text-[13px] font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="px-4 py-2 text-[13px] font-medium text-zinc-600 hover:bg-zinc-100 rounded-xl transition-colors cursor-pointer"
               >
                 Restart Later
               </button>
               <button
                 onClick={() => restartApp()}
-                className="px-4 py-2 text-[13px] font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-colors flex items-center gap-1.5 shadow-sm"
+                className="px-4 py-2 text-[13px] font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors flex items-center gap-1.5 shadow-xs cursor-pointer"
               >
-                <RefreshCw size={16} />
+                <RefreshCw size={15} />
                 Restart Now
               </button>
             </>
@@ -252,13 +252,13 @@ export const UpdateModal = () => {
             <>
               <button
                 onClick={handleClose}
-                className="px-4 py-2 text-[13px] font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                className="px-4 py-2 text-[13px] font-medium text-zinc-600 hover:bg-zinc-100 rounded-xl transition-colors cursor-pointer"
               >
                 Close
               </button>
               <button
                 onClick={() => checkForUpdates()}
-                className="px-4 py-2 text-[13px] font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+                className="px-4 py-2 text-[13px] font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors cursor-pointer shadow-xs"
               >
                 Try Again
               </button>

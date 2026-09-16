@@ -19,7 +19,6 @@ import {
   Star,
   Copy,
   FolderInput,
-  ChevronsLeft,
   RefreshCw,
   ExternalLink,
   Sparkles,
@@ -54,7 +53,6 @@ export const Sidebar = () => {
     openLayerModal,
     sidebarWidth,
     setSidebarWidth,
-    toggleSidebar,
   } = useStore(useShallow((state) => ({
     openTab: state.openTab,
     openInCurrentTab: state.openInCurrentTab,
@@ -77,7 +75,6 @@ export const Sidebar = () => {
     openLayerModal: state.openLayerModal,
     sidebarWidth: state.sidebarWidth,
     setSidebarWidth: state.setSidebarWidth,
-    toggleSidebar: state.toggleSidebar,
   })));
 
   const startResizing = (e: React.MouseEvent) => {
@@ -339,27 +336,31 @@ export const Sidebar = () => {
             e.stopPropagation();
             openInCurrentTab(note.id);
           }}
-          className={`group flex items-center gap-2.5 px-2.5 py-1.5 rounded-md cursor-pointer text-[14px] font-medium transition-colors ${selectedNoteId === note.id ? "bg-[#E5E7EB] text-gray-900" : "text-gray-600 hover:bg-gray-100"}`}
+          className={`group flex items-center gap-2 px-2.5 py-1.5 rounded-lg cursor-pointer text-[13px] font-medium transition-all ${
+            selectedNoteId === note.id
+              ? "bg-zinc-200/80 text-zinc-900 font-semibold shadow-xs"
+              : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/70"
+          }`}
         >
           <div className="flex items-center gap-1">
             {childNotes.length > 0 && !isSpecialSection && (
               <div
                 onClick={(e) => toggleNote(note.id, e)}
-                className="p-0.5 hover:bg-gray-200 rounded text-gray-400 -ml-1"
+                className="p-0.5 hover:bg-zinc-200 rounded text-zinc-400 -ml-1 transition-colors"
               >
                 {expandedNotes[note.id] !== false ? (
-                  <ChevronDown size={14} />
+                  <ChevronDown size={13} />
                 ) : (
-                  <ChevronRight size={14} />
+                  <ChevronRight size={13} />
                 )}
               </div>
             )}
             <FileText
               size={14}
               className={
-                selectedNoteId === note.id ? "text-gray-600" : "text-gray-400"
+                selectedNoteId === note.id ? "text-zinc-700" : "text-zinc-400"
               }
-              strokeWidth={selectedNoteId === note.id ? 2.5 : 2}
+              strokeWidth={selectedNoteId === note.id ? 2.2 : 1.8}
             />
           </div>
 
@@ -373,15 +374,19 @@ export const Sidebar = () => {
                 if (e.key === "Enter") submitRenameNote(note.id);
                 if (e.key === "Escape") setEditingNoteId(null);
               }}
-              className="flex-1 bg-white text-gray-900 px-1 outline-none rounded border border-gray-300"
+              className="flex-1 bg-white text-zinc-900 px-1.5 py-0.5 text-[13px] outline-none rounded border border-blue-500 shadow-xs ring-2 ring-blue-500/20"
               onClick={(e) => e.stopPropagation()}
             />
           ) : (
-            <span className="flex-1 truncate">{note.title || "Untitled"}</span>
+            <span className="flex-1 truncate tracking-tight">{note.title || "Untitled"}</span>
           )}
 
           <div
-            className={`flex items-center transition-opacity ${contextMenuNoteId === contextId || addMenuNoteId === contextId ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+            className={`flex items-center transition-opacity ${
+              contextMenuNoteId === contextId || addMenuNoteId === contextId
+                ? "opacity-100"
+                : "opacity-0 group-hover:opacity-100"
+            }`}
           >
             {!isSpecialSection && depth < 1 && (
               <button
@@ -391,10 +396,10 @@ export const Sidebar = () => {
                     ? setAddMenuNoteId(null)
                     : openMenu(e, setAddMenuNoteId, contextId);
                 }}
-                className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-700 mr-0.5"
+                className="p-1 hover:bg-zinc-200/80 rounded text-zinc-400 hover:text-zinc-700 mr-0.5 transition-colors"
                 title="Add nested note"
               >
-                <Plus size={14} />
+                <Plus size={13} strokeWidth={2} />
               </button>
             )}
             <button
@@ -403,9 +408,9 @@ export const Sidebar = () => {
                   ? setContextMenuNoteId(null)
                   : openMenu(e, setContextMenuNoteId, contextId)
               }
-              className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-700"
+              className="p-1 hover:bg-zinc-200/80 rounded text-zinc-400 hover:text-zinc-700 transition-colors"
             >
-              <MoreHorizontal size={14} />
+              <MoreHorizontal size={13} strokeWidth={2} />
             </button>
           </div>
         </div>
@@ -413,24 +418,24 @@ export const Sidebar = () => {
         {/* Note Context Menu */}
         {contextMenuNoteId === contextId && (
           <div
-            className="fixed w-48 bg-white rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-gray-100 z-50 py-1.5"
+            className="fixed w-48 bg-white/95 backdrop-blur-md rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.06)] z-50 p-1"
             style={{ top: menuPos.top, left: menuPos.left }}
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="w-full text-left px-3 py-1.5 text-[14px] text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 font-medium"
+              className="w-full text-left px-2.5 py-1.5 text-[13px] text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100/80 rounded-lg flex items-center gap-2.5 font-medium transition-colors"
               onClick={(e) => {
                 e.stopPropagation();
                 openTab(note.id);
                 setContextMenuNoteId(null);
               }}
             >
-              <Plus size={15} className="text-gray-500" /> Open in new tab
+              <Plus size={14} className="text-zinc-400" /> Open in new tab
             </button>
 
             {!isSpecialSection && depth < 1 && (
               <button
-                className="w-full text-left px-3 py-1.5 text-[14px] text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 font-medium"
+                className="w-full text-left px-2.5 py-1.5 text-[13px] text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100/80 rounded-lg flex items-center gap-2.5 font-medium transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   addMenuNoteId === contextId
@@ -438,37 +443,37 @@ export const Sidebar = () => {
                     : openMenu(e, setAddMenuNoteId, contextId);
                 }}
               >
-                <FileText size={15} className="text-gray-500" /> Add nested note
+                <FileText size={14} className="text-zinc-400" /> Add nested note
               </button>
             )}
 
             <button
-              className="w-full text-left px-3 py-1.5 text-[14px] text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 font-medium"
+              className="w-full text-left px-2.5 py-1.5 text-[13px] text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100/80 rounded-lg flex items-center gap-2.5 font-medium transition-colors"
               onClick={(e) =>
                 handleToggleFavorite(note.id, note.isFavorite || false, e)
               }
             >
               <Star
-                size={15}
+                size={14}
                 className={
                   note.isFavorite
-                    ? "fill-yellow-400 text-yellow-400"
-                    : "text-gray-500"
+                    ? "fill-amber-400 text-amber-400"
+                    : "text-zinc-400"
                 }
               />{" "}
               {note.isFavorite ? "Remove Favorite" : "Add to Favorite"}
             </button>
 
             <button
-              className="w-full text-left px-3 py-1.5 text-[14px] text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 font-medium"
+              className="w-full text-left px-2.5 py-1.5 text-[13px] text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100/80 rounded-lg flex items-center gap-2.5 font-medium transition-colors"
               onClick={(e) => handleDuplicateNote(note.id, e)}
             >
-              <Copy size={15} className="text-gray-500" /> Duplicate
+              <Copy size={14} className="text-zinc-400" /> Duplicate
             </button>
 
             <div className="relative group/move">
               <button
-                className="w-full text-left px-3 py-1.5 text-[14px] text-gray-700 hover:bg-gray-50 flex items-center justify-between font-medium"
+                className="w-full text-left px-2.5 py-1.5 text-[13px] text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100/80 rounded-lg flex items-center justify-between font-medium transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
                   setShowMoveMenuForNoteId(
@@ -477,17 +482,17 @@ export const Sidebar = () => {
                 }}
               >
                 <div className="flex items-center gap-2.5">
-                  <FolderInput size={15} className="text-gray-500" /> Move to
+                  <FolderInput size={14} className="text-zinc-400" /> Move to
                 </div>
-                <ChevronRight size={14} className="text-gray-400" />
+                <ChevronRight size={13} className="text-zinc-400" />
               </button>
 
               {/* Move Submenu */}
               {showMoveMenuForNoteId === contextId && (
-                <div className="absolute left-full top-0 ml-1 w-40 bg-white rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.08)] border border-gray-100 py-1.5 z-50">
+                <div className="absolute left-full top-0 ml-1 w-44 bg-white/95 backdrop-blur-md rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.06)] p-1 z-50">
                   {Object.values(layers).filter((s) => s.id !== note.layerId)
                     .length === 0 ? (
-                    <div className="px-3 py-1.5 text-[13px] text-gray-400 italic">
+                    <div className="px-2.5 py-1.5 text-[12px] text-zinc-400 italic">
                       No other layers
                     </div>
                   ) : (
@@ -496,13 +501,17 @@ export const Sidebar = () => {
                       .map((s) => (
                         <button
                           key={s.id}
-                          className="w-full text-left px-3 py-1.5 text-[13px] hover:bg-gray-50 text-gray-600 hover:text-gray-900 font-medium truncate transition-colors"
+                          className="w-full text-left px-2.5 py-1.5 text-[13px] hover:bg-zinc-100/80 text-zinc-700 hover:text-zinc-900 rounded-lg font-medium truncate transition-colors flex items-center gap-2"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleMoveNote(note.id, s.id);
                           }}
                         >
-                          {s.name}
+                          <span
+                            className="w-2 h-2 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: s.accentColor || "#a1a1aa" }}
+                          />
+                          <span className="truncate">{s.name}</span>
                         </button>
                       ))
                   )}
@@ -511,19 +520,19 @@ export const Sidebar = () => {
             </div>
 
             <button
-              className="w-full text-left px-3 py-1.5 text-[14px] text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 font-medium"
+              className="w-full text-left px-2.5 py-1.5 text-[13px] text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100/80 rounded-lg flex items-center gap-2.5 font-medium transition-colors"
               onClick={(e) => startRenameNote(note.id, note.title, e)}
             >
-              <Edit2 size={15} className="text-gray-500" /> Rename
+              <Edit2 size={14} className="text-zinc-400" /> Rename
             </button>
 
-            <div className="h-px bg-gray-100 my-1"></div>
+            <div className="h-px bg-zinc-100 my-1"></div>
 
             <button
-              className="w-full text-left px-3 py-1.5 text-[14px] text-red-600 hover:bg-red-50 flex items-center gap-2.5 font-medium"
+              className="w-full text-left px-2.5 py-1.5 text-[13px] text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-2.5 font-medium transition-colors"
               onClick={(e) => handleDeleteNote(note.id, e)}
             >
-              <Trash2 size={15} /> Delete
+              <Trash2 size={14} /> Delete
             </button>
           </div>
         )}
@@ -531,18 +540,18 @@ export const Sidebar = () => {
         {/* Add Note Context Menu */}
         {addMenuNoteId === contextId && (
           <div
-            className="fixed w-40 bg-white rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-gray-100 z-50 py-1"
+            className="fixed w-40 bg-white/95 backdrop-blur-md rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.06)] z-50 p-1"
             style={{ top: menuPos.top, left: menuPos.left }}
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              className="w-full text-left px-3 py-1.5 text-[14px] text-gray-700 hover:bg-gray-50 flex items-center gap-2.5 font-medium"
+              className="w-full text-left px-2.5 py-1.5 text-[13px] text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100/80 rounded-lg flex items-center gap-2.5 font-medium transition-colors"
               onClick={(e) => {
                 handleCreateNestedNote(note.layerId, note.id, e);
                 setAddMenuNoteId(null);
               }}
             >
-              <FileText size={14} className="text-gray-500" /> Empty Note
+              <FileText size={14} className="text-zinc-400" /> Empty Note
             </button>
           </div>
         )}
@@ -551,7 +560,7 @@ export const Sidebar = () => {
         {childNotes.length > 0 &&
           expandedNotes[note.id] !== false &&
           !isSpecialSection && (
-            <div className="ml-[16px] pl-2 border-l border-gray-200 mt-0.5 space-y-0.5">
+            <div className="ml-[14px] pl-2 border-l border-zinc-200/80 mt-0.5 space-y-0.5">
               {childNotes.map((child) =>
                 renderNoteItem(child, "default", depth + 1),
               )}
@@ -563,278 +572,287 @@ export const Sidebar = () => {
 
   return (
     <div
-      className="bg-[#F9FAFB] h-screen flex flex-col border-r border-gray-200 select-none relative flex-shrink-0"
+      className="bg-[#F8F9FA] h-screen flex flex-col border-r border-zinc-200/80 select-none relative flex-shrink-0"
       style={{ width: sidebarWidth }}
     >
-      {/* Traffic Lights & Drag Region */}
+      {/* Window Drag & Brand Header */}
       <div
         data-tauri-drag-region
-        className="h-[48px] w-full flex-shrink-0 drag-region relative"
-      ></div>
+        className="h-[44px] flex items-center justify-between px-3 border-b border-zinc-200/70 bg-zinc-50/40 drag-region shrink-0"
+      >
+        {/* On macOS traffic lights take ~68px on left */}
+        <div data-tauri-drag-region className="flex items-center gap-2 pl-[68px] select-none">
+          <div className="w-5 h-5 rounded-md bg-zinc-900 text-white flex items-center justify-center font-bold text-[11px] shadow-xs">
+            P
+          </div>
+          <span className="font-semibold text-[13.5px] text-zinc-800 tracking-tight">PaperLayr</span>
+        </div>
 
-      <div
-        className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-gray-200 active:bg-gray-300 z-50 transition-colors"
-        onMouseDown={startResizing}
-      />
+        <div className="flex items-center gap-1 text-zinc-500">
+          <button
+            onClick={() => setSearchOpen(true)}
+            className="flex items-center gap-1 px-1.5 py-1 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-200/60 rounded-md transition-colors text-xs"
+            title="Search notes (Cmd+K)"
+          >
+            <Search size={14} strokeWidth={2} />
+            <kbd className="text-[10px] font-medium bg-zinc-200/70 text-zinc-500 px-1 py-0.5 rounded leading-none">⌘K</kbd>
+          </button>
 
-      <div className="px-4">
-        <div className="flex items-center justify-between">
-          <span className="font-bold text-[15px] text-gray-800">PaperLayr</span>
-          <div className="flex items-center gap-1.5 text-gray-500">
+          <div className="relative">
             <button
-              onClick={() => setSearchOpen(true)}
-              className="hover:text-gray-800 hover:bg-gray-100 p-1.5 rounded transition-colors"
-              title="Search notes"
+              onClick={openSettingsMenu}
+              className={`p-1 rounded-md transition-colors relative ${
+                isSettingsOpen
+                  ? "text-zinc-900 bg-zinc-200"
+                  : "hover:text-zinc-900 hover:bg-zinc-200/60 text-zinc-400"
+              }`}
+              title="Settings & Updates"
             >
-              <Search size={18} strokeWidth={1.5} />
-            </button>
-            <div className="relative">
-              <button
-                onClick={openSettingsMenu}
-                className={`p-1.5 rounded transition-colors relative ${
-                  isSettingsOpen
-                    ? "text-gray-900 bg-gray-200"
-                    : "hover:text-gray-800 hover:bg-gray-100 text-gray-500"
-                }`}
-                title="Settings & Updates"
-              >
-                <Settings size={18} strokeWidth={1.5} />
-                {hasUpdate && (
-                  <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-blue-600 ring-2 ring-white" />
-                )}
-              </button>
-
-              {isSettingsOpen && (
-                <div
-                  className="fixed w-56 bg-white rounded-xl shadow-[0_10px_38px_rgba(0,0,0,0.15)] border border-gray-100 py-1.5 z-50 text-[13px]"
-                  style={{ top: settingsMenuPos.top, left: settingsMenuPos.left }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="px-3.5 py-2 border-b border-gray-100 flex items-center justify-between">
-                    <div>
-                      <div className="font-semibold text-gray-800">PaperLayr</div>
-                      <div className="text-[11px] text-gray-400">v{currentVersion}</div>
-                    </div>
-                    {hasUpdate && (
-                      <span className="text-[11px] bg-blue-50 text-blue-600 font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <Sparkles size={10} /> Update
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="py-1">
-                    <button
-                      onClick={() => {
-                        setIsSettingsOpen(false);
-                        checkForUpdates();
-                      }}
-                      className="w-full text-left px-3.5 py-2 text-gray-700 hover:bg-gray-50 flex items-center justify-between transition-colors"
-                    >
-                      <span className="flex items-center gap-2">
-                        <RefreshCw size={14} className="text-gray-400" />
-                        Check for Updates...
-                      </span>
-                      {hasUpdate && (
-                        <span className="w-2 h-2 rounded-full bg-blue-600" />
-                      )}
-                    </button>
-
-                    <button
-                      onClick={async () => {
-                        setIsSettingsOpen(false);
-                        try {
-                          await openUrl("https://github.com/quirkysaad/PaperLayr");
-                        } catch {
-                          window.open("https://github.com/quirkysaad/PaperLayr", "_blank");
-                        }
-                      }}
-                      className="w-full text-left px-3.5 py-2 text-gray-700 hover:bg-gray-50 flex items-center justify-between transition-colors"
-                    >
-                      <span className="flex items-center gap-2">
-                        <ExternalLink size={14} className="text-gray-400" />
-                        GitHub Repository
-                      </span>
-                    </button>
-                  </div>
-                </div>
+              <Settings size={15} strokeWidth={1.75} />
+              {hasUpdate && (
+                <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-blue-600 ring-2 ring-white" />
               )}
-            </div>
+            </button>
+
+            {isSettingsOpen && (
+              <div
+                className="fixed w-56 bg-white/95 backdrop-blur-md rounded-xl shadow-[0_10px_30px_-5px_rgba(0,0,0,0.12),0_0_0_1px_rgba(0,0,0,0.06)] p-1 z-50 text-[13px]"
+                style={{ top: settingsMenuPos.top, left: settingsMenuPos.left }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="px-3 py-2 border-b border-zinc-100 flex items-center justify-between">
+                  <div>
+                    <div className="font-semibold text-zinc-800">PaperLayr</div>
+                    <div className="text-[11px] text-zinc-400">v{currentVersion}</div>
+                  </div>
+                  {hasUpdate && (
+                    <span className="text-[11px] bg-blue-50 text-blue-600 font-medium px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <Sparkles size={10} /> Update
+                    </span>
+                  )}
+                </div>
+
+                <div className="py-1">
+                  <button
+                    onClick={() => {
+                      setIsSettingsOpen(false);
+                      checkForUpdates();
+                    }}
+                    className="w-full text-left px-2.5 py-1.5 text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100/80 rounded-lg flex items-center justify-between transition-colors font-medium"
+                  >
+                    <span className="flex items-center gap-2">
+                      <RefreshCw size={14} className="text-zinc-400" />
+                      Check for Updates...
+                    </span>
+                    {hasUpdate && (
+                      <span className="w-2 h-2 rounded-full bg-blue-600" />
+                    )}
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      setIsSettingsOpen(false);
+                      try {
+                        await openUrl("https://github.com/quirkysaad/PaperLayr");
+                      } catch {
+                        window.open("https://github.com/quirkysaad/PaperLayr", "_blank");
+                      }
+                    }}
+                    className="w-full text-left px-2.5 py-1.5 text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100/80 rounded-lg flex items-center justify-between transition-colors font-medium"
+                  >
+                    <span className="flex items-center gap-2">
+                      <ExternalLink size={14} className="text-zinc-400" />
+                      GitHub Repository
+                    </span>
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto mt-6">
+      <div
+        className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-400/50 active:bg-blue-500 z-50 transition-colors"
+        onMouseDown={startResizing}
+      />
+
+      <div className="flex-1 overflow-y-auto pt-4 pb-6 space-y-5 px-2">
         {favoriteNotes.length > 0 && (
-          <div className="mb-6">
-            <div className="flex items-center justify-between px-5 mb-2 group">
-              <span className="text-[13px] text-gray-400 tracking-wider font-medium">
-                FAVORITES
+          <div>
+            <div className="flex items-center justify-between px-2.5 mb-1.5 group">
+              <span className="text-[11px] text-zinc-400 tracking-wider font-semibold uppercase select-none">
+                Favorites
               </span>
             </div>
-            <div className="px-3 space-y-0.5">
+            <div className="space-y-0.5">
               {favoriteNotes.map((note) => renderNoteItem(note, "favorites"))}
             </div>
           </div>
         )}
 
         {stickyNotes.length > 0 && (
-          <div className="mb-6">
-            <div className="flex items-center justify-between px-5 mb-2 group">
-              <span className="text-[13px] text-gray-400 tracking-wider font-medium">
-                STICKIES
+          <div>
+            <div className="flex items-center justify-between px-2.5 mb-1.5 group">
+              <span className="text-[11px] text-zinc-400 tracking-wider font-semibold uppercase select-none">
+                Stickies
               </span>
             </div>
-            <div className="px-3 space-y-0.5">
+            <div className="space-y-0.5">
               {stickyNotes.map((note) => renderNoteItem(note, "stickies"))}
             </div>
           </div>
         )}
 
-        <div className="flex items-center justify-between px-5 mb-2 group">
-          <span className="text-[13px] text-gray-400 tracking-wider font-medium">
-            LAYERS
-          </span>
-          <button
-            onClick={handleCreateLayer}
-            className="text-gray-400 hover:text-gray-600 p-0.5 rounded cursor-pointer"
-          >
-            <Plus size={18} strokeWidth={2} />
-          </button>
-        </div>
+        <div>
+          <div className="flex items-center justify-between px-2.5 mb-1.5 group">
+            <span className="text-[11px] text-zinc-400 tracking-wider font-semibold uppercase select-none">
+              Layers
+            </span>
+            <button
+              onClick={handleCreateLayer}
+              className="text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200/60 p-1 rounded-md transition-colors cursor-pointer"
+              title="Create new layer"
+            >
+              <Plus size={14} strokeWidth={2} />
+            </button>
+          </div>
 
-        {layerList.map((layer) => {
-          const isLayerViewActive =
-            selectedLayerId === layer.id && !selectedNoteId;
-          const isLayerParentActive =
-            selectedLayerId === layer.id && !!selectedNoteId;
+          <div className="space-y-1">
+            {layerList.map((layer) => {
+              const isLayerViewActive =
+                selectedLayerId === layer.id && !selectedNoteId;
+              const isLayerParentActive =
+                selectedLayerId === layer.id && !!selectedNoteId;
 
-          let layerClassName =
-            "text-gray-600 hover:bg-gray-100 border border-transparent";
-          if (isLayerViewActive) {
-            layerClassName =
-              "bg-[#E5E7EB] text-gray-900 border border-transparent";
-          } else if (isLayerParentActive) {
-            layerClassName =
-              "border border-dashed text-gray-800 bg-gray-50/50 hover:bg-gray-100";
-          }
+              let layerClassName =
+                "text-zinc-600 hover:bg-zinc-100/80 hover:text-zinc-900 border border-transparent";
+              if (isLayerViewActive) {
+                layerClassName =
+                  "bg-zinc-200/80 text-zinc-900 font-semibold shadow-xs border border-transparent";
+              } else if (isLayerParentActive) {
+                layerClassName =
+                  "text-zinc-900 bg-zinc-100 font-medium border border-transparent";
+              }
 
-          return (
-            <div key={layer.id} className="mb-1">
-              <div
-                className={`group flex items-center gap-1.5 px-2 py-1 mx-1 rounded-md cursor-pointer text-[15px] font-medium transition-colors ${layerClassName}`}
-                style={
-                  isLayerParentActive
-                    ? { borderColor: layer.accentColor || "#d1d5db" }
-                    : undefined
-                }
-                onClick={(e) => {
-                  toggleLayer(layer.id, e);
-                  setSelectedLayer(layer.id);
-                  setSelectedNote(null);
-                }}
-              >
-                <div className="text-gray-400 mr-0.5">
-                  {expandedLayers[layer.id] !== false ? (
-                    <ChevronDown size={16} strokeWidth={1.5} />
-                  ) : (
-                    <ChevronRight size={16} strokeWidth={1.5} />
+              return (
+                <div key={layer.id} className="group/layer">
+                  <div
+                    className={`flex items-center gap-1.5 px-2 py-1.5 rounded-lg cursor-pointer text-[13.5px] font-medium transition-colors ${layerClassName}`}
+                    onClick={(e) => {
+                      toggleLayer(layer.id, e);
+                      setSelectedLayer(layer.id);
+                      setSelectedNote(null);
+                    }}
+                  >
+                    <div className="text-zinc-400 hover:text-zinc-700 transition-colors p-0.5 -ml-1">
+                      {expandedLayers[layer.id] !== false ? (
+                        <ChevronDown size={14} strokeWidth={1.8} />
+                      ) : (
+                        <ChevronRight size={14} strokeWidth={1.8} />
+                      )}
+                    </div>
+                    <div
+                      className="w-2.5 h-2.5 rounded-full mr-0.5 flex-shrink-0 shadow-xs ring-1 ring-black/10"
+                      style={{ backgroundColor: layer.accentColor || "#a1a1aa" }}
+                    />
+                    <span className="flex-1 truncate tracking-tight">{layer.name}</span>
+
+                    <div
+                      className={`flex items-center transition-opacity ${
+                        contextMenuLayerId === layer.id || addMenuLayerId === layer.id
+                          ? "opacity-100"
+                          : "opacity-0 group-hover/layer:opacity-100"
+                      }`}
+                    >
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addMenuLayerId === layer.id
+                            ? setAddMenuLayerId(null)
+                            : openMenu(e, setAddMenuLayerId, layer.id);
+                        }}
+                        className="p-1 hover:bg-zinc-200/80 rounded text-zinc-400 hover:text-zinc-700 mr-0.5 transition-colors"
+                        title="Add note in layer"
+                      >
+                        <Plus size={14} strokeWidth={2} />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          contextMenuLayerId === layer.id
+                            ? setContextMenuLayerId(null)
+                            : openMenu(e, setContextMenuLayerId, layer.id);
+                        }}
+                        className="p-1 hover:bg-zinc-200/80 rounded text-zinc-400 hover:text-zinc-700 transition-colors"
+                      >
+                        <MoreHorizontal size={14} strokeWidth={2} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Add Note Menu */}
+                  {addMenuLayerId === layer.id && (
+                    <div
+                      className="fixed w-40 bg-white/95 backdrop-blur-md rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.06)] z-50 p-1"
+                      style={{ top: menuPos.top, left: menuPos.left }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        className="w-full text-left px-2.5 py-1.5 text-[13px] text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100/80 rounded-lg flex items-center gap-2 font-medium transition-colors"
+                        onClick={(e) => {
+                          handleCreateNote(layer.id, e);
+                          setAddMenuLayerId(null);
+                        }}
+                      >
+                        <FileText size={14} className="text-zinc-400" /> Empty Note
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Context Menu */}
+                  {contextMenuLayerId === layer.id && (
+                    <div
+                      className="fixed w-36 bg-white/95 backdrop-blur-md rounded-xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1),0_0_0_1px_rgba(0,0,0,0.06)] z-50 p-1"
+                      style={{ top: menuPos.top, left: menuPos.left }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        className="w-full text-left px-2.5 py-1.5 text-[13px] text-zinc-700 hover:text-zinc-900 hover:bg-zinc-100/80 rounded-lg flex items-center gap-2 font-medium transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openLayerModal("edit", layer.id);
+                          setContextMenuLayerId(null);
+                        }}
+                      >
+                        <Edit2 size={14} className="text-zinc-400" /> Edit Layer
+                      </button>
+                      <button
+                        className="w-full text-left px-2.5 py-1.5 text-[13px] text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-2 font-medium transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteLayer(layer.id, e);
+                        }}
+                      >
+                        <Trash2 size={14} /> Delete
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Layer Notes */}
+                  {expandedLayers[layer.id] !== false && (
+                    <div className="ml-[18px] pl-2 border-l border-zinc-200/80 my-1 space-y-0.5 pr-1">
+                      {Object.values(notes)
+                        .filter((n) => n.layerId === layer.id && !n.parentId)
+                        .sort((a, b) => a.createdAt - b.createdAt)
+                        .map((note) => renderNoteItem(note, "default"))}
+                    </div>
                   )}
                 </div>
-                <div
-                  className="w-2.5 h-2.5 rounded-full mr-1 flex-shrink-0"
-                  style={{ backgroundColor: layer.accentColor || "#d1d5db" }}
-                />
-                <span className="flex-1 truncate">{layer.name}</span>
-
-                <div
-                  className={`flex items-center transition-opacity ${contextMenuLayerId === layer.id || addMenuLayerId === layer.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
-                >
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      addMenuLayerId === layer.id
-                        ? setAddMenuLayerId(null)
-                        : openMenu(e, setAddMenuLayerId, layer.id);
-                    }}
-                    className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-700 mr-0.5"
-                    title="Add new note"
-                  >
-                    <Plus size={16} strokeWidth={1.5} />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      contextMenuLayerId === layer.id
-                        ? setContextMenuLayerId(null)
-                        : openMenu(e, setContextMenuLayerId, layer.id);
-                    }}
-                    className="p-1 hover:bg-gray-200 rounded text-gray-400 hover:text-gray-700"
-                  >
-                    <MoreHorizontal size={16} strokeWidth={1.5} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Add Note Menu */}
-              {addMenuLayerId === layer.id && (
-                <div
-                  className="fixed w-40 bg-white rounded-md shadow-lg border border-gray-100 z-50 py-1"
-                  style={{ top: menuPos.top, left: menuPos.left }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button
-                    className="w-full text-left px-3 py-1.5 text-[13px] text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                    onClick={(e) => {
-                      handleCreateNote(layer.id, e);
-                      setAddMenuLayerId(null);
-                    }}
-                  >
-                    <FileText size={14} /> Empty Note
-                  </button>
-                </div>
-              )}
-
-              {/* Context Menu */}
-              {contextMenuLayerId === layer.id && (
-                <div
-                  className="fixed w-32 bg-white rounded-md shadow-lg border border-gray-100 z-50 py-1"
-                  style={{ top: menuPos.top, left: menuPos.left }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <button
-                    className="w-full text-left px-3 py-1.5 text-[13px] text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openLayerModal("edit", layer.id);
-                      setContextMenuLayerId(null);
-                    }}
-                  >
-                    <Edit2 size={14} /> Edit
-                  </button>
-                  <button
-                    className="w-full text-left px-3 py-1.5 text-[13px] text-red-500 hover:bg-gray-50 flex items-center gap-2"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteLayer(layer.id, e);
-                    }}
-                  >
-                    <Trash2 size={14} /> Delete
-                  </button>
-                </div>
-              )}
-
-              {/* Layer Notes */}
-              {expandedLayers[layer.id] !== false && (
-                <div className="ml-[22px] pl-2 border-l border-gray-200 my-1 space-y-0.5 pr-2">
-                  {Object.values(notes)
-                    .filter((n) => n.layerId === layer.id && !n.parentId)
-                    .sort((a, b) => a.createdAt - b.createdAt)
-                    .map((note) => renderNoteItem(note, "default"))}
-                </div>
-              )}
-            </div>
-          );
-        })}
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Click outside context menus */}

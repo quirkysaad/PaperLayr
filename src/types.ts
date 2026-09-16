@@ -25,7 +25,6 @@ export interface AppState {
   selectedLayerId: string | null;
   selectedNoteId: string | null;
   openTabs: string[];
-  isSidebarOpen: boolean;
   searchQuery: string;
   isSearchOpen: boolean;
   searchMode?: 'navigate' | 'newTab';

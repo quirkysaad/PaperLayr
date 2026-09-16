@@ -37,7 +37,6 @@ interface Store extends AppState {
   // UI Actions
   setSelectedLayer: (id: string | null) => void;
   setSelectedNote: (id: string | null) => void;
-  toggleSidebar: () => void;
   setSearchOpen: (isOpen: boolean, mode?: 'navigate' | 'newTab') => void;
   setSearchQuery: (query: string) => void;
   
@@ -64,7 +63,6 @@ export const useStore = create<Store>()(
       selectedLayerId: null,
       selectedNoteId: null,
       openTabs: [],
-      isSidebarOpen: true,
       searchQuery: '',
       isSearchOpen: false,
       searchMode: 'navigate',
@@ -254,7 +252,6 @@ export const useStore = create<Store>()(
 
       setSelectedLayer: (id) => set({ selectedLayerId: id }),
       setSelectedNote: (id) => set({ selectedNoteId: id }),
-      toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
       setSearchOpen: (isOpen, mode = 'navigate') => set((state) => ({ 
         isSearchOpen: isOpen, 
         searchMode: mode,
@@ -326,7 +323,6 @@ export const useStore = create<Store>()(
                 selectedLayerId: state.selectedLayerId,
         selectedNoteId: state.selectedNoteId,
         openTabs: state.openTabs,
-        isSidebarOpen: state.isSidebarOpen,
         sidebarWidth: state.sidebarWidth,
       }) as any, // Cast to any to avoid generic inference issues with Store
     }
