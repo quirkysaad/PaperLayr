@@ -20,7 +20,7 @@ interface EditorBubbleMenuProps {
   editor: Editor
 }
 
-const FONT_SIZES = Array.from({ length: (56 - 8) / 4 + 1 }, (_, i) => 8 + i * 4)
+const FONT_SIZES = Array.from({ length: (56 - 8) / 2 + 1 }, (_, i) => 8 + i * 2)
 
 const HIGHLIGHT_COLORS = [
   { label: 'Yellow', color: '#fef08a' },
@@ -94,17 +94,16 @@ export const EditorBubbleMenu = ({ editor }: EditorBubbleMenuProps) => {
   const currentFontSize = parseInt(currentFontSizeStr) || 16
 
   return (
-    <BubbleMenu 
-      editor={editor} 
+    <BubbleMenu
+      editor={editor}
       options={{ placement: 'top' }}
       className="flex items-center gap-0.5 bg-white/95 backdrop-blur-md border border-zinc-200/80 shadow-[0_12px_32px_rgba(0,0,0,0.12),0_0_0_1px_rgba(0,0,0,0.05)] rounded-xl p-1 z-50"
     >
       <div className="relative" ref={menuRef}>
         <button
           onClick={toggleFontSize}
-          className={`flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-zinc-100 text-xs font-semibold text-zinc-700 transition-colors cursor-pointer ${
-            isFontSizeOpen ? 'bg-zinc-100' : ''
-          }`}
+          className={`flex items-center gap-1 px-2 py-1.5 rounded-lg hover:bg-zinc-100 text-xs font-semibold text-zinc-700 transition-colors cursor-pointer ${isFontSizeOpen ? 'bg-zinc-100' : ''
+            }`}
         >
           <Type size={14} />
           <span className="w-5 text-center">{currentFontSize}</span>
@@ -130,9 +129,8 @@ export const EditorBubbleMenu = ({ editor }: EditorBubbleMenuProps) => {
       <div className="relative" ref={highlightRef}>
         <button
           onClick={toggleHighlight}
-          className={`flex items-center justify-center p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${
-            editor.isActive('highlight') ? 'bg-blue-50 text-blue-600' : 'text-zinc-600'
-          }`}
+          className={`flex items-center justify-center p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${editor.isActive('highlight') ? 'bg-blue-50 text-blue-600' : 'text-zinc-600'
+            }`}
           title="Highlight"
         >
           <Highlighter size={15} />
@@ -176,9 +174,8 @@ export const EditorBubbleMenu = ({ editor }: EditorBubbleMenuProps) => {
       <div className="relative" ref={textColorRef}>
         <button
           onClick={toggleTextColor}
-          className={`flex items-center justify-center p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${
-            editor.getAttributes('textStyle').color ? 'bg-blue-50 text-blue-600' : 'text-zinc-600'
-          }`}
+          className={`flex items-center justify-center p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${editor.getAttributes('textStyle').color ? 'bg-blue-50 text-blue-600' : 'text-zinc-600'
+            }`}
           title="Text Color"
         >
           <Baseline size={15} />
@@ -223,9 +220,8 @@ export const EditorBubbleMenu = ({ editor }: EditorBubbleMenuProps) => {
 
       <button
         onClick={() => editor.chain().focus().toggleBold().run()}
-        className={`p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${
-          editor.isActive('bold') ? 'bg-zinc-900 text-white hover:bg-black hover:text-white' : 'text-zinc-600'
-        }`}
+        className={`p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${editor.isActive('bold') ? 'bg-zinc-900 text-white hover:bg-black hover:text-white' : 'text-zinc-600'
+          }`}
         title="Bold"
       >
         <Bold size={15} />
@@ -233,9 +229,8 @@ export const EditorBubbleMenu = ({ editor }: EditorBubbleMenuProps) => {
 
       <button
         onClick={() => editor.chain().focus().toggleItalic().run()}
-        className={`p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${
-          editor.isActive('italic') ? 'bg-zinc-900 text-white hover:bg-black hover:text-white' : 'text-zinc-600'
-        }`}
+        className={`p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${editor.isActive('italic') ? 'bg-zinc-900 text-white hover:bg-black hover:text-white' : 'text-zinc-600'
+          }`}
         title="Italic"
       >
         <Italic size={15} />
@@ -243,9 +238,8 @@ export const EditorBubbleMenu = ({ editor }: EditorBubbleMenuProps) => {
 
       <button
         onClick={() => editor.chain().focus().toggleUnderline().run()}
-        className={`p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${
-          editor.isActive('underline') ? 'bg-zinc-900 text-white hover:bg-black hover:text-white' : 'text-zinc-600'
-        }`}
+        className={`p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${editor.isActive('underline') ? 'bg-zinc-900 text-white hover:bg-black hover:text-white' : 'text-zinc-600'
+          }`}
         title="Underline"
       >
         <UnderlineIcon size={15} />
@@ -253,19 +247,17 @@ export const EditorBubbleMenu = ({ editor }: EditorBubbleMenuProps) => {
 
       <button
         onClick={() => editor.chain().focus().toggleStrike().run()}
-        className={`p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${
-          editor.isActive('strike') ? 'bg-zinc-900 text-white hover:bg-black hover:text-white' : 'text-zinc-600'
-        }`}
+        className={`p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${editor.isActive('strike') ? 'bg-zinc-900 text-white hover:bg-black hover:text-white' : 'text-zinc-600'
+          }`}
         title="Strikethrough"
       >
         <Strikethrough size={15} />
       </button>
-      
+
       <button
         onClick={() => editor.chain().focus().toggleCode().run()}
-        className={`p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${
-          editor.isActive('code') ? 'bg-zinc-900 text-white hover:bg-black hover:text-white' : 'text-zinc-600'
-        }`}
+        className={`p-1.5 rounded-lg hover:bg-zinc-100 transition-colors cursor-pointer ${editor.isActive('code') ? 'bg-zinc-900 text-white hover:bg-black hover:text-white' : 'text-zinc-600'
+          }`}
         title="Code"
       >
         <Code size={15} />
