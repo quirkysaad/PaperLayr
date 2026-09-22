@@ -3,7 +3,7 @@ import Suggestion from '@tiptap/suggestion';
 import { ReactRenderer } from '@tiptap/react';
 import tippy from 'tippy.js';
 import { SlashCommandList } from './SlashCommandList';
-import { Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code, Minus, CheckSquare, Image as ImageIcon } from 'lucide-react';
+import { Heading1, Heading2, Heading3, List, ListOrdered, Quote, Code, Minus, CheckSquare, Image as ImageIcon, Link } from 'lucide-react';
 import React from 'react';
 
 const getSuggestionItems = ({ query }: { query: string }) => {
@@ -99,6 +99,22 @@ const getSuggestionItems = ({ query }: { query: string }) => {
       icon: React.createElement(Minus, { size: 16 }),
       command: ({ editor, range }: any) => {
         editor.chain().focus().deleteRange(range).setHorizontalRule().run();
+      },
+    },
+    {
+      title: 'Bookmark',
+      description: 'Embed a rich website bookmark.',
+      icon: React.createElement(Link, { size: 16 }),
+      command: ({ editor, range }: any) => {
+        const url = prompt("Enter the URL to bookmark:");
+        if (url) {
+          editor.chain().focus().deleteRange(range).insertContent({
+            type: 'bookmark',
+            attrs: { url }
+          }).run();
+        } else {
+          editor.chain().focus().deleteRange(range).run();
+        }
       },
     },
   ].filter((item) => item.title.toLowerCase().startsWith(query.toLowerCase()));

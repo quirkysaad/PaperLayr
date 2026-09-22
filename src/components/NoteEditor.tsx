@@ -10,6 +10,8 @@ import TaskItem from "@tiptap/extension-task-item";
 import Highlight from "@tiptap/extension-highlight";
 import { Color } from "@tiptap/extension-color";
 import { CustomImage } from "./editor/CustomImage";
+import { Bookmark } from "./editor/Bookmark";
+import { Hashtag } from "./editor/Hashtag";
 import { useStore } from "../store";
 import { useShallow } from "zustand/react/shallow";
 import { useEffect, useState, useRef, useMemo } from "react";
@@ -77,6 +79,8 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
     Color,
     FontSize,
     Highlight.configure({ multicolor: true }),
+    Bookmark,
+    Hashtag,
   ], []);
 
   const editorProps = useMemo(() => ({
@@ -140,6 +144,25 @@ export const NoteEditor = ({ noteId }: { noteId: string }) => {
 
       const html = event.clipboardData?.getData("text/html") || "";
       const text = event.clipboardData?.getData("text/plain") || "";
+
+      // Check if the pasted text is a single valid URL
+      try {
+        const urlStr = text.trim();
+        const url = new URL(urlStr);
+        if (url.protocol === "http:" || url.protocol === "https:") {
+          // If it's a URL, auto-convert it to a bookmark
+          event.preventDefault();
+          const { schema } = _view.state;
+          const node = schema.nodes.bookmark.create({
+            url: url.href,
+          });
+          const transaction = _view.state.tr.replaceSelectionWith(node);
+          _view.dispatch(transaction);
+          return true;
+        }
+      } catch (e) {
+        // Not a URL, continue with normal paste handling
+      }
 
       if (hasMultipleBrOrNbsp(html, text)) {
         event.preventDefault();

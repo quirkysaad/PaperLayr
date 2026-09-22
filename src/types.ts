@@ -12,6 +12,7 @@ export interface Note {
   parentId?: string;
   title: string;
   content: string; // HTML or JSON from Tiptap
+  tags?: string[];
   isFavorite?: boolean;
   createdAt: number;
   updatedAt: number;

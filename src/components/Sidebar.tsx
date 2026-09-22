@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Settings,
   Bell,
@@ -98,6 +98,23 @@ export const Sidebar = () => {
   const stickyNotes = Object.values(notes).filter(
     (n) => n.layerId === "stickies",
   );
+
+  const allTags = useMemo(() => {
+    const tags = new Set<string>();
+    Object.values(notes).forEach(note => {
+      if (note.tags && note.tags.length > 0) {
+        note.tags.forEach(t => tags.add(t));
+      } else if (note.content) {
+        const textContent = note.content.replace(/<[^>]*>?/gm, ' ');
+        const regex = /(?:^|\s)(#[\w-]+)/g;
+        let match;
+        while ((match = regex.exec(textContent)) !== null) {
+          tags.add(match[1].toLowerCase());
+        }
+      }
+    });
+    return Array.from(tags).sort();
+  }, [notes]);
 
   const [expandedLayers, setExpandedLayers] = useState<Record<string, boolean>>(
     {},
@@ -703,6 +720,35 @@ export const Sidebar = () => {
             </div>
           </div>
         )}
+
+        <div>
+          <div className="flex items-center justify-between px-2.5 mb-1.5 group">
+            <span className="text-[11px] text-zinc-400 tracking-wider font-semibold uppercase select-none">
+              Tags
+            </span>
+          </div>
+          <div className="space-y-0.5">
+            {allTags.length === 0 ? (
+              <div className="px-3 py-1.5 text-[12px] text-zinc-400 italic">
+                No tags yet. Type #tag in a note
+              </div>
+            ) : (
+              allTags.map((tag) => (
+                <div
+                  key={tag}
+                  onClick={() => {
+                    setSearchQuery(tag);
+                    setSearchOpen(true, 'navigate');
+                  }}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg cursor-pointer text-[13px] font-medium text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100/70 transition-all"
+                >
+                  <span className="text-zinc-400 font-bold opacity-60">#</span>
+                  <span className="flex-1 truncate tracking-tight">{tag.substring(1)}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
 
         <div>
           <div className="flex items-center justify-between px-2.5 mb-1.5 group">

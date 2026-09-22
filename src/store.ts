@@ -4,6 +4,18 @@ import { get, set as idbSet, del } from 'idb-keyval';
 import { v4 as uuidv4 } from 'uuid';
 import { AppState, Note, Layer } from './types';
 
+const extractTags = (content: string): string[] => {
+  if (!content) return [];
+  // Basic HTML strip to text
+  const textContent = content.replace(/<[^>]*>?/gm, ' ');
+  const regex = /(?:^|\s)(#[\w-]+)/g;
+  const tags = new Set<string>();
+  let match;
+  while ((match = regex.exec(textContent)) !== null) {
+    tags.add(match[1].toLowerCase());
+  }
+  return Array.from(tags);
+};
 // Custom storage engine using IndexedDB
 const idbStorage: StateStorage = {
   getItem: async (name: string): Promise<string | null> => {
@@ -149,10 +161,14 @@ export const useStore = create<Store>()(
         set((state) => {
           const note = state.notes[id];
           if (!note) return state;
+          const newNote = { ...note, ...updates, updatedAt: Date.now() };
+          if (updates.content !== undefined) {
+            newNote.tags = extractTags(updates.content);
+          }
           return {
             notes: {
               ...state.notes,
-              [id]: { ...note, ...updates, updatedAt: Date.now() },
+              [id]: newNote,
             },
           };
         });

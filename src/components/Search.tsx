@@ -76,7 +76,8 @@ export const Search = () => {
 
     // Search notes
     Object.values(notes).forEach(note => {
-      if (note.title.toLowerCase().includes(query) || note.content.toLowerCase().includes(query)) {
+      const matchTag = query.startsWith('#') && note.tags?.includes(query);
+      if (matchTag || note.title.toLowerCase().includes(query) || note.content.toLowerCase().includes(query)) {
         const layer = layers[note.layerId];
         const layerName = note.layerId === 'stickies' ? 'Stickies' : (layer?.name || 'Workspace');
         results.push({ 
